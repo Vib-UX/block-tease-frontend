@@ -2,22 +2,15 @@
 import { ethers } from 'ethers';
 
 const provider = new ethers.providers.Web3Provider(window.ethereum);
+import mockUsdAbi from '../constant/MockUSD.json';
+import purchaseSubscriptionAbi from '../constant/PurchaseSubscription.json';
+import batchAbi from '../constant/Batch.json';
 
 const purchaseSubscriptionAddress =
   '0xF99b791257ab50be7F235BC825E7d4B83942cf38';
 const mockUsdAddress = '0x309222b7833D3D0A59A8eBf9C64A5790bf43E2aA';
 const batchAddress = '0x0000000000000000000000000000000000000808';
-const mockUsdAbi = [
-  'function balanceOf(address account) external view returns (uint256)',
-  'function approve(address spender, uint256 amount) external returns (bool)',
-];
-const purchaseSubscriptionAbi = [
-  'function subscribeWithToken(uint256 modelId, uint256 subscriptionId, uint256 priceInUsd) external',
-];
 
-const batchAbi = [
-  'function batchAll(address[] targets, uint256[] values, bytes[] data, uint256[] gasLimits) external returns (bool)',
-];
 export async function checkBalances() {
   const signer = provider.getSigner();
   const signerAddress = await signer.getAddress();
@@ -82,5 +75,5 @@ export async function batchSubscribe(modelId, subscriptionId, priceInUsd) {
 }
 
 export const main = async () => {
-  await batchSubscribe(4, 3, 2);
+  await batchSubscribe(4, 3, 1);
 };
