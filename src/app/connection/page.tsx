@@ -7,8 +7,9 @@ declare global {
 import detectEthereumProvider from '@metamask/detect-provider';
 import React from 'react';
 
-import Button from '@/components/buttons/Button';
 import { main } from '@/lib/func';
+
+import Button from '@/components/buttons/Button';
 const Connection = () => {
   const [account, setAccount] = React.useState<string | null>(null);
   const configureMoonbaseAlpha = async () => {
@@ -45,10 +46,10 @@ const Connection = () => {
     const acc = await window.ethereum.enable();
     setAccount(acc[0]);
   };
-  const executer = async() => {
-    console.log('exceuting')
-    main()
-  }
+  const executer = async () => {
+    console.log('exceuting');
+    main();
+  };
   React.useEffect(() => {
     getAccount();
   }, []);

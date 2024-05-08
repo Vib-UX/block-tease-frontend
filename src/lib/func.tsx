@@ -1,11 +1,11 @@
 // import { MockUSDABI, PurchaseSubscriptionABI, BatchABI } from '@/constant/abi';
 import { ethers } from 'ethers';
 
-import mockUsdAbi from '../constant/MockUSD.json';
-import purchaseSubscriptionAbi from '../constant/PurchaseSubscription.json';
 import batchAbi from '../constant/Batch.json';
+import mockUsdAbi from '../constant/MockUSD.json';
+import nftMarketPlaceAbi from '../constant/NftMarketPlace.json';
 import precompileAbi from '../constant/Precompile.json';
-
+import purchaseSubscriptionAbi from '../constant/PurchaseSubscription.json';
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 
 const purchaseSubscriptionAddress =
@@ -13,7 +13,46 @@ const purchaseSubscriptionAddress =
 const mockUsdAddress = '0x309222b7833D3D0A59A8eBf9C64A5790bf43E2aA';
 const batchAddress = '0x0000000000000000000000000000000000000808';
 const precompileAddress = '0x000000000000000000000000000000000000080a';
+const nft = '0x309222b7833D3D0A59A8eBf9C64A5790bf43E2aA';
+const nftMarketPlaceAddr = '0x3FA6cfdC28Ad346c4360AA0543b5BfdA551c7111';
+type minitingNftProps = {
+  modelId: number;
+  fromAddr: string;
+};
+type batchSubscribeProps = {
+  modelId: number;
+  subscriptionId: number;
+  priceInUsd: number;
+};
 
+async function mintingNft({ modelId, fromAddr }: minitingNftProps) {
+  const customNetwork = {
+    name: 'Polygon Amoy Testnet',
+    chainId: 80002,
+    url: 'https://rpc-amoy.polygon.technology',
+  };
+  const nftProvider = new ethers.providers.JsonRpcProvider(customNetwork.url);
+  console.log(nftProvider);
+  const thirdPartyGasSigner = new ethers.Wallet(
+    process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
+    nftProvider
+  );
+  console.log(thirdPartyGasSigner);
+  const nftMarketPlace = new ethers.Contract(
+    nftMarketPlaceAddr,
+    nftMarketPlaceAbi,
+    thirdPartyGasSigner
+  );
+  console.log(nftMarketPlace);
+
+  const txResponse = await nftMarketPlace.purchaseSubscription(
+    modelId,
+    fromAddr
+  );
+  console.log(txResponse);
+  const resp = await txResponse.wait();
+  console.log(resp);
+}
 export async function checkBalances() {
   const signer = provider.getSigner();
   const signerAddress = await signer.getAddress();
@@ -37,12 +76,15 @@ export async function checkBalances() {
   );
   return { subscriptionBalance, signerBalance };
 }
-
-export async function batchSubscribe(modelId, subscriptionId, priceInUsd) {
+export async function batchSubscribe({
+  modelId,
+  subscriptionId,
+  priceInUsd,
+}: batchSubscribeProps) {
   await checkBalances();
 
   const thirdPartyGasSigner = new ethers.Wallet(
-    process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER,
+    process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
     provider
   );
 
@@ -142,8 +184,19 @@ export async function batchSubscribe(modelId, subscriptionId, priceInUsd) {
   console.log(`Gasless Batch Precompile Transaction hash: ${dispatch.hash}`);
 
   await checkBalances();
+  return { fromAddr: dispatch.from, dispatch: dispatch.hash };
 }
 
 export const main = async () => {
-  await batchSubscribe(4, 3, 10);
+  const resp = await batchSubscribe({
+    modelId: 4,
+    subscriptionId: 3,
+    priceInUsd: 10,
+  });
+  if (resp.dispatch) {
+    await mintingNft({
+      modelId: 1,
+      fromAddr: resp.fromAddr,
+    });
+  }
 };
