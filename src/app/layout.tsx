@@ -1,11 +1,13 @@
 import { Metadata } from 'next';
 import * as React from 'react';
+import { Toaster } from 'react-hot-toast';
 
 import '@/styles/globals.css';
 // !STARTERCONF This is for demo purposes, remove @/styles/colors.css import immediately
 import '@/styles/colors.css';
 
 import { siteConfig } from '@/constant/config';
+import { Providers } from '@/redux/tools/Providers';
 
 // !STARTERCONF Change these default meta
 // !STARTERCONF Look at @/constant/config to change them
@@ -21,8 +23,8 @@ export const metadata: Metadata = {
   // ! copy to /favicon folder
   icons: {
     icon: '/favicon/favicon.ico',
-    shortcut: '/favicon/favicon-16x16.png',
-    apple: '/favicon/apple-touch-icon.png',
+    shortcut: '/favicon/favicon.ico',
+    apple: '/favicon/favicon.ico',
   },
   manifest: `/favicon/site.webmanifest`,
   openGraph: {
@@ -56,7 +58,10 @@ export default function RootLayout({
 }) {
   return (
     <html>
-      <body>{children}</body>
+      <body>
+        <Toaster position='top-center' reverseOrder={false} />
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
