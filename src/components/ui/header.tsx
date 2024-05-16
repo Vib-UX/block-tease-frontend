@@ -1,11 +1,12 @@
 'use client';
-declare global {
-  interface Window {
-    ethereum: any;
-  }
-}
-import detectEthereumProvider from '@metamask/detect-provider';
+
+import {
+  useDisconnect,
+  useWeb3Modal,
+  useWeb3ModalAccount,
+} from '@web3modal/ethers5/react';
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 import { ImSpinner2 } from 'react-icons/im';
 
@@ -34,79 +35,51 @@ const getButtonCTA = ({
 };
 
 const Header = () => {
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [account, setAccount] = React.useState<string | null>(null);
-  const configureMoonbaseAlpha = async () => {
-    const provider: any = await detectEthereumProvider({
-      mustBeMetaMask: true,
-    });
-    if (provider) {
-      try {
-        await provider.request({ method: 'eth_requestAccounts' });
-        await provider.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: '0x507',
-              chainName: 'Moonbase Alpha',
-              nativeCurrency: {
-                name: 'DEV',
-                symbol: 'DEV',
-                decimals: 18,
-              },
-              rpcUrls: ['https://rpc.api.moonbase.moonbeam.network'],
-              blockExplorerUrls: ['https://moonbase.moonscan.io/'],
-            },
-          ],
-        });
-        const chainId = await provider.request({
-          method: 'eth_chainId',
-        });
-        // Moonbase Alpha's chainId is 1287, which is 0x507 in hex
-        if (chainId === '0x507') {
-          const accountAddr =
-            typeof window !== 'undefined' && (await window.ethereum.enable());
-          setAccount(accountAddr[0]);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      console.error('Please install MetaMask');
-    }
-  };
+  const { open } = useWeb3Modal();
+  const { address } = useWeb3ModalAccount();
+  const { disconnect } = useDisconnect();
+
   return (
-    <div className='w-full flex items-center justify-around bg-[#130D1A] p-6 '>
-      <Image src={logo} priority alt='logo' width={200} height={100} />
-      <div className='w-[60%] relative'>
-        <input
-          placeholder='Search here'
-          className=' text-[#CEB9E9] w-[50%] ml-4 bg-[#2B213B] outline-none focus:outline-none rounded-xl  px-10 '
-        />
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          fill='none'
-          viewBox='0 0 24 24'
-          strokeWidth={1.5}
-          stroke='currentColor'
-          className='w-6 h-6 absolute text-[#CEB9E9] top-0 translate-x-full translate-y-1/3 '
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            d='m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'
-          />
-        </svg>
+    <div className='w-full flex items-center justify-around bg-[#130D1A] p-6 sticky top-0 z-50 '>
+      <div className='w-[25%] flex flex-col text-center    '>
+        <Link href='/'>
+          <Image src={logo} priority alt='logo' width={200} height={100} />
+          <span className=' text-[#CEB9E9]'>
+            only<span className='text-blue-500'>Fans</span> for Web3
+          </span>
+        </Link>
       </div>
-      <div className='flex items-center justify-end w-[20%] ml-10'>
+      <div className='w-[50%]'>
+        <div className='m-4 p-[0.8px] rounded-xl w-[80%] bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500 relative '>
+          <input
+            placeholder='Search here'
+            className=' text-[#CEB9E9] w-full  h-10 bg-[#2B213B] outline-none focus:outline-none rounded-xl  px-12  '
+          />
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            fill='none'
+            viewBox='0 0 24 24'
+            strokeWidth={1.5}
+            stroke='currentColor'
+            className='w-6 h-6 absolute text-[#CEB9E9] top-0 translate-x-full translate-y-1/3 '
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              d='m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'
+            />
+          </svg>
+        </div>
+      </div>
+      <div className='flex items-center justify-end w-[25%] ml-10'>
         <button
-          onClick={() => configureMoonbaseAlpha()}
-          className='z-30 relative bg- w-[150px] h-[40px] bg-[rgb(251,3,147)] bg-gradient-to-b from-[rgba(251,3,147,1)] from-[0%] to-[rgba(20,12,54,0.4)] to-[84%] font-bold rounded-md text-white  py-2'
+          onClick={() => (!address ? open() : disconnect())}
+          className='z-30 relative bg- w-[150px] h-[40px] bg-gradient-to-b from-[#FB0393] from-[0%] to-[#9A3CFF] to-[100%] font-bold rounded-md text-white  py-2'
         >
           {getButtonCTA({
             isLoading: false || false,
-            text: account
-              ? account.slice(0, 4) + '...' + account.slice(4, 7)
+            text: address
+              ? address.slice(0, 4) + '...' + address.slice(4, 7)
               : 'Connect wallet',
           })}
         </button>

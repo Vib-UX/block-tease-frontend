@@ -1,87 +1,65 @@
 'use client';
 import Image from 'next/image';
-import React from 'react';
+import Link from 'next/link';
+import React, { useState } from 'react';
 
-import MyModal from '@/components/ui/dialog';
+import RippleLoader from '@/components/buttons/rippleLoader';
+import CountdownTimer from '@/components/ui/timer';
 
 const ModelCard = ({
+  slug,
   name,
   icon,
   image,
   value,
   views,
-  likes,
+  Tease,
   location,
+  index,
 }: {
+  slug: string;
   name: string;
   icon: any;
   image: any;
   value: number;
   views: number;
-  likes: number;
+  Tease: number;
   location: string;
+  index: number;
 }) => {
+  const [dialogFor, setDialogfor] = useState('Sale ends');
+
   return (
-    <div className=' w-[240px] lg:w-[250px]'>
-      <div className=' flex items-center  rounded-t-lg  justify-between p-3 bg-[#2B213B] '>
-        <div className='flex items-center gap-2  '>
-          <div className=' w-[30px] h-[30px] bg-white rounded-full'>
-            <Image src={icon} alt='model icon' className='rounded-full' />
+    <div className='z-10 relative overflow-hidden rounded-xl'>
+      <div className=' z-0 h-[200px]'>
+
+      </div>
+      <Image
+        src={icon}
+        priority
+
+        alt='model'
+        className='absolute  -z-10 top-1/3 -translate-x-1/2 -translate-y-1/2 left-1/2  w-full h-[400px]   rounded-t-lg'
+      />
+      <div className=' z-20 flex flex-col gap-2 rounded-b-lg  justify-between p-3 bg-[#2B213B] '>
+        <div className='text-[#CEB9E9]'>
+
+          <div className='flex items-center gap-3 pb-2 '>
+            <div className=' w-[40px] h-[40px] bg-white rounded-full'>
+              <Image src={icon} alt='model icon' className='rounded-full w-full h-full object-cover' />
+            </div>
+
+            <p className='capitalize text-sm flex gap-1 justify-center items-center'>{name.split(" ")[0]}.Tease <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+            </svg>
+            </p>
           </div>
 
-          <p className=' text-sm'>{name}</p>
-        </div>
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          fill='none'
-          viewBox='0 0 24 24'
-          strokeWidth={1.5}
-          stroke='currentColor'
-          className='w-6 h-6'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            d='M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z'
-          />
-        </svg>
-      </div>
-      <div className='w-full'>
-        <Image
-          src={image}
-          priority
-          alt='model'
-          className='object-cover w-full '
-        />
-      </div>
-
-      <div className=' flex flex-col gap-2 rounded-b-lg  justify-between p-3 bg-[#2B213B] '>
-        <div className='text-[#CEB9E9]'>
           <p>{location}</p>
-          <p className=' flex items-center gap-1'>
-            {' '}
-            <svg
-              aria-label='USDC'
-              width='.5em'
-              height='.5em'
-              viewBox='0 0 32 32'
-              xmlns='http://www.w3.org/2000/svg'
-              className='inline-block size-[.7lh] shrink-0'
-            >
-              <g fill='none'>
-                <circle cx='16' cy='16' r='16' fill='#3E73C4'></circle>
-                <g fill='#FFF'>
-                  <path d='M20.022 18.124c0-2.124-1.28-2.852-3.84-3.156c-1.828-.243-2.193-.728-2.193-1.578c0-.85.61-1.396 1.828-1.396c1.097 0 1.707.364 2.011 1.275a.458.458 0 0 0 .427.303h.975a.416.416 0 0 0 .427-.425v-.06a3.04 3.04 0 0 0-2.743-2.489V9.142c0-.243-.183-.425-.487-.486h-.915c-.243 0-.426.182-.487.486v1.396c-1.829.242-2.986 1.456-2.986 2.974c0 2.002 1.218 2.791 3.778 3.095c1.707.303 2.255.668 2.255 1.639c0 .97-.853 1.638-2.011 1.638c-1.585 0-2.133-.667-2.316-1.578c-.06-.242-.244-.364-.427-.364h-1.036a.416.416 0 0 0-.426.425v.06c.243 1.518 1.219 2.61 3.23 2.914v1.457c0 .242.183.425.487.485h.915c.243 0 .426-.182.487-.485V21.34c1.829-.303 3.047-1.578 3.047-3.217z'></path>
-                  <path d='M12.892 24.497c-4.754-1.7-7.192-6.98-5.424-11.653c.914-2.55 2.925-4.491 5.424-5.402c.244-.121.365-.303.365-.607v-.85c0-.242-.121-.424-.365-.485c-.061 0-.183 0-.244.06a10.895 10.895 0 0 0-7.13 13.717c1.096 3.4 3.717 6.01 7.13 7.102c.244.121.488 0 .548-.243c.061-.06.061-.122.061-.243v-.85c0-.182-.182-.424-.365-.546zm6.46-18.936c-.244-.122-.488 0-.548.242c-.061.061-.061.122-.061.243v.85c0 .243.182.485.365.607c4.754 1.7 7.192 6.98 5.424 11.653c-.914 2.55-2.925 4.491-5.424 5.402c-.244.121-.365.303-.365.607v.85c0 .242.121.424.365.485c.061 0 .183 0 .244-.06a10.895 10.895 0 0 0 7.13-13.717c-1.096-3.46-3.778-6.07-7.13-7.162z'></path>
-                </g>
-              </g>
-            </svg>
-            {value}
-          </p>
         </div>
-        <div className=' flex  items-center justify-between'>
-          <div className='flex gap-4 '>
-            <span className='flex gap-1 text-xs font-light'>
+        <div className=' flex flex-col gap-4  items-center justify-between'>
+          <div className='flex justify-between w-full gap-4 '>
+            <span className='flex gap-1 text-sm items-center font-light'>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 fill='none'
@@ -103,7 +81,13 @@ const ModelCard = ({
               </svg>
               {views}M
             </span>
-            <span className='flex gap-1 text-xs font-light'>
+            <span className='flex gap-1 text-sm items-center font-light'>
+              <svg className='w-4 h-4' viewBox="0 0 29 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1.59901 17.6116C2.25123 18.2415 2.95961 18.8155 3.71604 19.327C3.91455 19.4635 4.17672 19.4797 4.39181 19.3687C4.60689 19.2577 4.73736 19.0388 4.72808 18.8046C4.55306 14.947 4.90017 3.02643 15.5352 0.0234903C15.743 -0.0349206 15.9674 0.0173659 16.1242 0.160692C16.281 0.304018 16.3463 0.51666 16.2956 0.718671C13.5438 11.8994 20.4363 15.3139 23.5687 10.0369C23.6699 9.86162 23.8595 9.75006 24.0682 9.7429C24.2769 9.73575 24.4742 9.83404 24.5883 10.0019C27.3254 14.0605 26.6031 17.6919 25.8687 19.5874C25.7473 19.9107 25.8467 20.2724 26.1183 20.4963C26.3899 20.7203 26.7775 20.7599 27.0922 20.596C27.5548 20.352 27.9806 20.0486 28.358 19.6943C28.4524 19.6078 28.5914 19.5834 28.7116 19.6322C28.8319 19.6809 28.9104 19.7936 28.9115 19.9189V19.927C28.9145 27.4061 22.7392 33.5412 14.9505 33.7972C7.16182 34.0532 0.563646 28.3379 0.0334209 20.8761C-0.0320938 19.9482 -0.00123588 19.0163 0.125539 18.0942C0.167262 17.779 0.39238 17.5142 0.705695 17.4117C1.01901 17.3092 1.3658 17.3869 1.59942 17.612L1.59901 17.6116Z" fill="#F1673D" />
+              </svg>
+              {Tease}K
+            </span>
+            <span className=' flex gap-1 items-center text-sm  font-light'>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 fill='none'
@@ -115,14 +99,28 @@ const ModelCard = ({
                 <path
                   strokeLinecap='round'
                   strokeLinejoin='round'
-                  d='M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z'
+                  d='M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941'
                 />
               </svg>
-              {likes}K
+              93%
             </span>
           </div>
-
-          <MyModal dialogFor='Subscrbe' value={value} />
+          <div className='w-full'>
+            <Link href={`/profile/${slug}`}>
+              <button
+                onMouseEnter={() => setDialogfor('  View Full profile   ')}
+                onMouseLeave={() => setDialogfor('Sale ends')}
+                className=' cursor-pointer h-[37px] w-full group/button relative overflow-hidden rounded-md bg-[rgb(48,20,47)] bg-gradient-to-br from-[rgba(48,20,47,1)] from-[0%] to-[rgba(17,12,23,1)] to-[57%] px-5 py-1.5 text-xs font-medium text-[#CEB9E9] transition-all hover:border-red-500 active:scale-95'
+              >
+                <span className='absolute w-full bottom-0 left-0 z-0 h-0  bg-[#fb0393] transition-all duration-200 group-hover/button:h-full' />
+                <span className='relative w-full flex gap-2 justify-center items-center z-10 transition-all duration-500 group-hover/button:text-white'>
+                  {dialogFor === 'Sale ends' ? <RippleLoader /> : null}
+                  {dialogFor}
+                  {dialogFor === 'Sale ends' ? <CountdownTimer duration={7200 * (Math.floor(Math.random() * 10) + 1)} /> : null}
+                </span>
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
