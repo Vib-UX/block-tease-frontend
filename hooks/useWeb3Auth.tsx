@@ -185,7 +185,7 @@ function useWeb3Auth() {
   );
 
   return {
-    login
+    login, provider
   }
 }
 

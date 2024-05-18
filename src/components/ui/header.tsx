@@ -75,7 +75,7 @@ const Header = () => {
       </div>
       <div className='flex items-center justify-end w-[25%] ml-10'>
         <button
-          onClick={() => login()}
+          onClick={() => (!address ? open() : disconnect())}
           className='z-30 relative bg- w-[150px] h-[40px] bg-gradient-to-b from-[#FB0393] from-[0%] to-[#9A3CFF] to-[100%] font-bold rounded-md text-white  py-2'
         >
           {getButtonCTA({
