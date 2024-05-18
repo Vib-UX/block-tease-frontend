@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import amFlag from 'public/images/americaFlagIcon.png';
-import React from 'react';
 
 import CreatorsIcon from '@/../public/images/creatorsIcon.png';
 import FavoritesIcon from '@/../public/images/FavoritesIcon.png';
@@ -71,6 +70,7 @@ const sideBarcontentSpecials = [
 ];
 
 const SideBar = () => {
+
   return (
     <div className=' text-white h-full flex flex-col items-center w-[25%]   sticky -top-[40%] left-0 m-6'>
       <div className='bg-gradient-to-br  from-[#9A3CFF] from-[0%] to-[#5C2499] to-[100%] rounded-md p-[0.8px]'>
@@ -158,11 +158,10 @@ export const SideBarSections = ({
 }) => {
   return (
     <div
-      className={`${
-        sectionFor === 'specials'
+      className={`${sectionFor === 'specials'
           ? ' border-[#CEB9E9] border-y-[0.5px] py-6 px-4 w-[80%]'
           : ''
-      }  flex flex-col  gap-4 items-center justify-around  `}
+        }  flex flex-col  gap-4 items-center justify-around  `}
     >
       <p className='capitalize  bg-gradient-to-br text-2xl font-bold  from-[#FB0393] from-[0%] to-[#9A3CFF] to-[100%] bg-clip-text text-transparent text-center'>
         {sectionFor}

@@ -7,6 +7,9 @@ import '@/styles/colors.css';
 
 import Headers from '@/components/ui/header';
 import SideBar from '@/components/ui/sideBar';
+import { Web3Auth } from "@web3auth/modal";
+import { CHAIN_NAMESPACES, IProvider, WEB3AUTH_NETWORK } from "@web3auth/base";
+import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 
 import Providers from '@/app/Providers';
 import { siteConfig } from '@/constant/config';

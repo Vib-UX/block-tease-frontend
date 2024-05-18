@@ -5,9 +5,9 @@ import {
   useWeb3Modal,
   useWeb3ModalAccount,
 } from '@web3modal/ethers5/react';
+import useWeb3Auth from 'hooks/useWeb3Auth';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
 import { ImSpinner2 } from 'react-icons/im';
 
 import { cn } from '@/lib/utils';
@@ -38,6 +38,8 @@ const Header = () => {
   const { open } = useWeb3Modal();
   const { address } = useWeb3ModalAccount();
   const { disconnect } = useDisconnect();
+
+  const { login } = useWeb3Auth()
 
   return (
     <div className='w-full flex items-center justify-around bg-[#130D1A] p-6 sticky top-0 z-50 '>
@@ -73,7 +75,7 @@ const Header = () => {
       </div>
       <div className='flex items-center justify-end w-[25%] ml-10'>
         <button
-          onClick={() => (!address ? open() : disconnect())}
+          onClick={() => login()}
           className='z-30 relative bg- w-[150px] h-[40px] bg-gradient-to-b from-[#FB0393] from-[0%] to-[#9A3CFF] to-[100%] font-bold rounded-md text-white  py-2'
         >
           {getButtonCTA({
