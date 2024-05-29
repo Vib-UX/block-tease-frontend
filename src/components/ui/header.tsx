@@ -227,7 +227,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
         </div>
       </div>
       <div className='flex items-center gap-6 justify-end w-1/4 mx-4'>
-        {loggedIn && (
+        {loggedIn && ipfsUrl && (
           <Avatar
             userName={name || ''}
             openId={openAiId}
