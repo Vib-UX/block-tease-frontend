@@ -174,7 +174,9 @@ function useWeb3auth(chainIndex?: number) {
     // // Get user's Ethereum public address
     // const address = await web3.eth.getAccounts();
     // setAddress(address[0]);
-    setAddress(smartAccountAddress);
+    const saAddress = await smartAccount?.getAccountAddress();
+    setAddress(saAddress || null);
+    setWalletAddress(saAddress);
   };
   const logout = async () => {
     // IMP START - Logout

@@ -1,40 +1,48 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import ListingDialog from '@/components/ui/marketPlaceDialoge';
 
 const MarketPlaceCard = ({
-  slug,
-  name,
-  icon,
-  image,
-  value,
-  views,
-  Tease,
-  location,
-  index,
-  id,
+  modelName,
+  modelId,
+  ipfsUrl,
 }: {
-  slug: string;
-  name: string;
-  icon: any;
-  image: any;
-  value: number;
-  views: number;
-  Tease: number;
-  location: string;
-  index: number;
-  id: number;
+  modelName: string;
+  modelId: string;
+  ipfsUrl: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [teaseData, setTeaseData] = useState({
+    name: '',
+    image: '',
+  });
+  useEffect(() => {
+    const fetchTeaseData = async (ipfs: string) => {
+      try {
+        const response = await fetch(ipfs);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const data = await response.json();
+        console.log(data);
+        setTeaseData(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
+    fetchTeaseData(ipfsUrl);
+  }, []);
   return (
     <div className='group wrapper z-10 relative overflow-hidden rounded-xl'>
       <div className='relative z-0 h-[300px]'>
         {/* Image */}
         <Image
-          src={icon}
+          height={200}
+          width={200}
+          src={teaseData.image}
           priority
           alt='model'
           className='absolute top-0 left-0 w-full h-full object-cover rounded-xl transition-opacity duration-300 opacity-100 group-hover:opacity-80'
@@ -45,13 +53,15 @@ const MarketPlaceCard = ({
           <div className='flex items-center justify-start gap-3 pb-2'>
             <div className='w-[40px] h-[40px] bg-white rounded-full overflow-hidden'>
               <Image
-                src={icon}
+                height={200}
+                width={200}
+                src={teaseData.image}
                 alt='model icon'
                 className='w-full h-full object-cover'
               />
             </div>
             <p className='capitalize text-md font-bold flex gap-1 justify-center items-center'>
-              {name.split(' ')[0]}.Tease{' '}
+              {teaseData.name}.Tease{' '}
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 fill='none'
@@ -83,13 +93,15 @@ const MarketPlaceCard = ({
             <div className='flex items-center w-full justify-start gap-2 '>
               <div className='w-[40px] h-[40px] bg-white rounded-full overflow-hidden'>
                 <Image
-                  src={icon}
+                  src={teaseData.image}
+                  height={200}
+                  width={200}
                   alt='model icon'
                   className='w-full h-full object-cover'
                 />
               </div>
               <p className='capitalize text-md font-bold flex gap-1 justify-center items-center'>
-                {name.split(' ')[0]}.Tease{' '}
+                {modelName}.Tease{' '}
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   fill='none'
@@ -107,10 +119,14 @@ const MarketPlaceCard = ({
               </p>
             </div>
             <p>NFT COLLECTION</p>
-            <p>List your nFt at the market place bala bla ablaa</p>
+            <p>List your nFt at the market place</p>
           </div>
 
-          <ListingDialog icon={icon} name={name} modelId={id} />
+          <ListingDialog
+            icon={teaseData.image}
+            name={modelName}
+            modelId={parseInt(modelId)}
+          />
         </motion.div>
       </div>
     </div>

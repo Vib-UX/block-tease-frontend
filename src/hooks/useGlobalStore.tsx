@@ -1,7 +1,6 @@
 import { BiconomySmartAccountV2 } from '@biconomy/account';
 import { create } from 'zustand';
 
-
 interface GlobalStore {
   walletAddress: string | null,
   smartAccount: BiconomySmartAccountV2 | null
@@ -20,4 +19,4 @@ const useGlobalStore = create<GlobalStore>()(
   }),
 )
 
-export default useGlobalStore
+export default useGlobalStore;
