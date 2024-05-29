@@ -529,7 +529,6 @@ export default function MyModal({
                               setTestTokensHash(resp.trxhash);
                               setLoadingState('Confirm Payment');
                             } else {
-                              debugger
                               toast.error('Something went wrong', toastStyles);
                               setTestTokensHash('');
                             }
