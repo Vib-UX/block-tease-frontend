@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { ImSpinner2 } from 'react-icons/im';
 import { IoMdPower } from 'react-icons/io';
 
+import useGlobalStore from '@/hooks/useGlobalStore';
 import useWeb3auth from '@/hooks/useWeb3auth';
 import { userOnBoarding } from '@/lib/func';
 import { cn, toastStyles } from '@/lib/utils';
@@ -40,16 +41,18 @@ type props = {
 };
 
 const Header = ({ isOpen, setIsOpen }: props) => {
+  const { walletAddress: address } = useGlobalStore()
   const {
     login,
     loggedIn,
     logout,
     name,
     provider,
-    address,
     email,
     smartAccount,
   } = useWeb3auth();
+
+  console.log(address, "opop");
 
   const [openAiId, setOpenAiId] = useState('');
   const [ipfsUrl, setIpfsUrl] = useState('');
