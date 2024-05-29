@@ -65,7 +65,7 @@ web3auth.configureAdapter(openloginAdapter);
 web3auth.configureAdapter(metamaskAdapter);
 
 function useWeb3auth() {
-  const { setSmartAccount, smartAccount } = useGlobalStore();
+  const { setSmartAccount, smartAccount, setSmartAddress } = useGlobalStore();
   const [smartAccountAddress, setSmartAccountAddress] = useState<string | null>(
     null
   );
@@ -119,6 +119,7 @@ function useWeb3auth() {
     setSmartAccount(smartWallet);
     const saAddress = await smartWallet.getAccountAddress();
     console.log('Smart Account Address', saAddress);
+    setSmartAddress(saAddress);
     setSmartAccountAddress(saAddress);
     setProvider(web3authProvider);
     if (web3auth.connected) {
@@ -142,7 +143,9 @@ function useWeb3auth() {
     // // Get user's Ethereum public address
     // const address = await web3.eth.getAccounts();
     // setAddress(address[0]);
-    setAddress(smartAccountAddress);
+    const saAddress = await smartAccount?.getAccountAddress();
+    setAddress(saAddress || null);
+    setSmartAddress(saAddress || null);
   };
   const logout = async () => {
     // IMP START - Logout

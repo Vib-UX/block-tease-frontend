@@ -10,26 +10,50 @@ import RightSideBar from '@/app/(main)/profile/(components)/rightSideBar';
 import { Props } from '@/app/(main)/profile/[id]/page';
 import NotFound from '@/app/not-found';
 import { allModelData } from '@/utils/modelData';
+import useWeb3auth from '@/hooks/useWeb3auth';
+import toast from 'react-hot-toast';
+import { toastStyles } from '@/lib/utils';
+import useGlobalStore from '@/hooks/useGlobalStore';
 const CreatorProfile = ({ params }: Props) => {
   const [modelFees, setModelFees] = useState<number>(0);
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
   const modelData = allModelData.filter((item) => item.slug === params.id)[0];
+  const { address } = useWeb3auth();
 
   const fetchModalFees = async () => {
     const data = await getModalPayment(modelData.id);
 
     setModelFees(parseInt(data));
   };
-  const fetchStatus = async (provider: any) => {
-    const res = await balanceOffModel(provider, modelData.id.toString());
-    setIsUnlocked(res);
-  };
-  React.useEffect(() => {
-    if (typeof window.ethereum !== 'undefined') {
-      const provider = new ethers.providers.Web3Provider(
-        window.ethereum as any
+  const fetchStatus = async (address: string) => {
+    // const res = await balanceOffModel(provider, modelData.id.toString());
+    // setIsUnlocked(res);
+    try {
+      const resp = await fetch(
+        `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}`,
+        {
+          method: 'GET',
+        }
       );
-      fetchStatus(provider);
+      const data = await resp.json();
+
+      if (data.success) {
+        const userData = data.data.subscriptions?.some(
+          (item: any) => item.modelId === modelData.id.toString()
+        );
+        if (userData) {
+          setIsUnlocked(true);
+        }
+      }
+    } catch (err) {
+      toast.dismiss();
+      toast.error('Something went wrong', toastStyles);
+    }
+  };
+  const { smartAddress } = useGlobalStore();
+  React.useEffect(() => {
+    if (smartAddress) {
+      fetchStatus(smartAddress);
     }
     fetchModalFees();
   }, []);

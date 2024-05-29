@@ -14,6 +14,7 @@ import { cn, toastStyles } from '@/lib/utils';
 import Avatar from '@/components/ui/avatar';
 
 import logo from '../../../public/images/logoWithoutGradient.png';
+import useGlobalStore from '@/hooks/useGlobalStore';
 const getButtonCTA = ({
   isLoading,
   text,
@@ -40,17 +41,9 @@ type props = {
 };
 
 const Header = ({ isOpen, setIsOpen }: props) => {
-  const {
-    login,
-    loggedIn,
-    logout,
-    name,
-    provider,
-    address,
-    email,
-    smartAccount,
-  } = useWeb3auth();
-
+  const { login, loggedIn, logout, name, provider, email, smartAccount } =
+    useWeb3auth();
+  const { smartAddress } = useGlobalStore();
   const [openAiId, setOpenAiId] = useState('');
   const [ipfsUrl, setIpfsUrl] = useState('');
   const [avatarLoading, setAvatarLoading] = useState(false);
@@ -99,7 +92,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
                 body: JSON.stringify({
                   username: name,
                   email: email,
-                  wallet_address: address,
+                  wallet_address: smartAddress,
                   ipfs_url: resp.metadataIPFSUrl,
                   openAi_tokenId: res.tokenId.toString(),
                 }),
@@ -107,7 +100,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
             );
             const data = await reps.json();
             if (data.success) {
-              fetchUserDetails(address || '');
+              fetchUserDetails(smartAddress || '');
             }
           }
         }
@@ -155,10 +148,10 @@ const Header = ({ isOpen, setIsOpen }: props) => {
     // if (loggedIn && name && localStorage.getItem(name) === null) {
     //   fetchNft();
     // }
-    if (address) {
-      fetchUserDetails(address);
+    if (smartAddress) {
+      fetchUserDetails(smartAddress);
     }
-  }, [address]);
+  }, [smartAddress]);
   return (
     <div className='w-full flex items-center justify-between bg-[#130D1A] px-6 py-4 lg:py-6 fixed top-0 z-50'>
       <div className='text-white lg:hidden'>
@@ -227,7 +220,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
         </div>
       </div>
       <div className='flex items-center gap-6 justify-end w-1/4 mx-4'>
-        {loggedIn && (
+        {smartAddress && (
           <Avatar
             userName={name || ''}
             openId={openAiId}
@@ -236,17 +229,19 @@ const Header = ({ isOpen, setIsOpen }: props) => {
           />
         )}
         <button
-          onClick={() => (!loggedIn ? login(0) : handleCopy(address || ''))}
+          onClick={() =>
+            !smartAddress ? login(0) : handleCopy(smartAddress || '')
+          }
           className='z-30 relative bg-gradient-to-b from-[#FB0393] to-[#9A3CFF] font-bold rounded-md text-white py-2 px-4'
         >
           {getButtonCTA({
             isLoading: false,
-            text: address
-              ? address.slice(0, 4) + '...' + address.slice(-4)
+            text: smartAddress
+              ? smartAddress.slice(0, 4) + '...' + smartAddress.slice(-4)
               : 'Connect wallet',
           })}
         </button>
-        {loggedIn && (
+        {smartAddress && (
           <div className='cursor-pointer' onClick={() => logout()}>
             <IoMdPower color='white' />
           </div>

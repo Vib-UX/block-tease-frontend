@@ -1,12 +1,11 @@
-"use client"
-import React from 'react'
+'use client';
+import React from 'react';
 
-import Headers from '@/components/ui/header'
-import SideBar from '@/components/ui/sideBar'
+import Headers from '@/components/ui/header';
+import SideBar from '@/components/ui/sideBar';
 
 const ClientComponent = ({ children }: any) => {
-  const [isOpen, setIsOpen] = React.useState(false)
-  console.log(isOpen)
+  const [isOpen, setIsOpen] = React.useState(false);
   return (
     <>
       <Headers isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -14,10 +13,9 @@ const ClientComponent = ({ children }: any) => {
         <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
 
         {children}
-
       </div>
     </>
-  )
-}
+  );
+};
 
-export default ClientComponent
+export default ClientComponent;

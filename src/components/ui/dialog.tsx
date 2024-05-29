@@ -224,8 +224,10 @@ export default function MyModal({
     }
   };
   React.useEffect(() => {
-    insufficiantBalance();
-  }, [walletChosen !== '']);
+    if (walletChosen !== '') {
+      insufficiantBalance();
+    }
+  }, []);
   return (
     <>
       <button

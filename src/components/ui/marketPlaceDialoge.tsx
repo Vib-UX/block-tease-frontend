@@ -87,6 +87,8 @@ export default function ListingDialog({ icon, name, modelId }: props) {
                   <div className=' flex justify-between'>
                     <div className='flex gap-2'>
                       <Image
+                        height={200}
+                        width={200}
                         src={icon}
                         alt={name}
                         className=' w-12 h-12 rounded-full'

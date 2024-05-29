@@ -1,3 +1,4 @@
+import { toastStyles } from '@/lib/utils';
 import {
   Button,
   Dialog,
@@ -6,6 +7,7 @@ import {
   TransitionChild,
 } from '@headlessui/react';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import {
   FacebookIcon,
   FacebookShareButton,
@@ -23,7 +25,6 @@ export default function ShareButton() {
   const title = 'Block tease';
   const url = window.location.href;
 
-  const [copied, setCopied] = useState(false);
   function open() {
     setIsOpen(true);
   }
@@ -32,15 +33,8 @@ export default function ShareButton() {
     setIsOpen(false);
   }
   const copyToClipboard = () => {
-    if (!copied) {
-      navigator.clipboard
-        .writeText(url)
-        .then(() => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        })
-        .catch((err) => console.error('Failed to copy text: ', err));
-    }
+    navigator.clipboard.writeText(url);
+    toast.success('Copied to clipboard', toastStyles);
   };
   return (
     <>
@@ -84,15 +78,10 @@ export default function ShareButton() {
                 <DialogPanel className=' max-w-md flex gap-4 flex-col items-center justify-start rounded-xl bg-white/5 p-6 backdrop-blur-2xl'>
                   <div className='mt-4 '>
                     <button
-                      className={`inline-flex items-center gap-2 rounded-md py-1.5 px-3 text-sm font-semibold text-white  focus:outline-none ${
-                        !copied
-                          ? 'focus:bg-gray-700 hover:bg-[#fb0393]'
-                          : 'bg-[#fb0393] cursor-not-allowed'
-                      }`}
+                      className={`inline-flex items-center gap-2 rounded-md py-1.5 px-3 text-sm font-semibold text-white  focus:outline-none  hover:bg-[#fb0393]`}
                       onClick={() => {
                         copyToClipboard();
                       }}
-                      disabled={copied}
                       style={{
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
@@ -135,10 +124,6 @@ export default function ShareButton() {
                       <RedditIcon size={32} round />
                     </RedditShareButton>
                   </div>
-
-                  {copied && (
-                    <span className='text-[#fb0393] text-sm ml-2'>Copied!</span>
-                  )}
                 </DialogPanel>
               </TransitionChild>
             </div>
