@@ -53,6 +53,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
 
   const [openAiId, setOpenAiId] = useState('');
   const [ipfsUrl, setIpfsUrl] = useState('');
+  const [avatarLoading, setAvatarLoading] = useState(false);
   const createNft = async () => {
     try {
       const res = await fetch(
@@ -128,6 +129,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
   };
   const fetchUserDetails = async (address: string) => {
     try {
+      setAvatarLoading(true);
       const resp = await fetch(
         `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}`,
         {
@@ -136,6 +138,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
       );
       const data = await resp.json();
       if (data.success) {
+        setAvatarLoading(false);
         setOpenAiId(data.data.user.openAi_tokenId);
         setIpfsUrl(data.data.user.ipfs_url);
       } else if (data.message === 'User not found') {
@@ -143,6 +146,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
         createNft();
       }
     } catch (error) {
+      setAvatarLoading(false);
       toast.dismiss();
       toast.error('Something went wrong', toastStyles);
     }
@@ -224,7 +228,12 @@ const Header = ({ isOpen, setIsOpen }: props) => {
       </div>
       <div className='flex items-center gap-6 justify-end w-1/4 mx-4'>
         {loggedIn && (
-          <Avatar userName={name || ''} openId={openAiId} ipfsUrl={ipfsUrl} />
+          <Avatar
+            userName={name || ''}
+            openId={openAiId}
+            ipfsUrl={ipfsUrl}
+            avatarLoading={avatarLoading}
+          />
         )}
         <button
           onClick={() => (!loggedIn ? login(0) : handleCopy(address || ''))}

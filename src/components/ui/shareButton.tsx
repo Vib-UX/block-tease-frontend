@@ -5,7 +5,6 @@ import {
   Transition,
   TransitionChild,
 } from '@headlessui/react';
-import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
   FacebookIcon,
@@ -21,9 +20,8 @@ import {
 export default function ShareButton() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const path = usePathname();
   const title = 'Block tease';
-  const url = ` https://block-tease.vercel.app${path}`;
+  const url = window.location.href;
 
   const [copied, setCopied] = useState(false);
   function open() {
@@ -44,7 +42,6 @@ export default function ShareButton() {
         .catch((err) => console.error('Failed to copy text: ', err));
     }
   };
-
   return (
     <>
       <Button

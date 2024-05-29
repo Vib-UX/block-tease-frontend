@@ -1,4 +1,5 @@
 'use client';
+import RippleLoader from '@/components/ui/RippleLoader';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
@@ -6,10 +7,12 @@ const Avatar = ({
   userName,
   openId,
   ipfsUrl,
+  avatarLoading,
 }: {
   userName: string;
   openId: string;
   ipfsUrl: string;
+  avatarLoading: boolean;
 }) => {
   const [teaseData, setTeaseData] = useState({
     name: '',
@@ -46,13 +49,17 @@ const Avatar = ({
       className=' flex flex-col gap-1 items-center justify-center cursor-pointer'
     >
       <div className='rounded-full'>
-        <Image
-          src={teaseData.image}
-          alt={teaseData.name}
-          width={50}
-          height={50}
-          className=' rounded-full'
-        />
+        {avatarLoading ? (
+          <RippleLoader />
+        ) : (
+          <Image
+            src={teaseData.image}
+            alt={teaseData.name}
+            width={50}
+            height={50}
+            className=' rounded-full'
+          />
+        )}
       </div>
 
       <p className='text-[#CEB9E9] text-sm font-semibold'>

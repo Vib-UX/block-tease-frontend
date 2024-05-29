@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 import amFlag from 'public/images/americaFlagIcon.png';
@@ -69,14 +69,12 @@ const sideBarcontentSpecials = [
   },
 ];
 type props = {
-  isOpen: boolean,
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-}
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const SideBar = ({ isOpen, setIsOpen }: props) => {
   const sidebarRef = useRef(null);
-
-
 
   const handleEscKey = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
@@ -85,12 +83,9 @@ const SideBar = ({ isOpen, setIsOpen }: props) => {
   };
 
   useEffect(() => {
-
     if (isOpen) {
-
       document.addEventListener('keydown', handleEscKey);
     } else {
-
       document.removeEventListener('keydown', handleEscKey);
     }
 
@@ -102,12 +97,16 @@ const SideBar = ({ isOpen, setIsOpen }: props) => {
   return (
     <div
       ref={sidebarRef}
-      className={`fixed lg:relative z-20 top-[6%]  left-0 lg:left-[20%] h-full  lg:w-[25%] bg-[#130D1A] text-white flex-col items-center transition-transform duration-300 ease-in-out transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+      className={`fixed lg:relative z-20 top-[6%]  left-0 lg:left-[20%] h-full  lg:w-[25%] bg-[#130D1A] text-white flex-col items-center transition-transform duration-300 ease-in-out transform ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}
     >
       <div className='flex py-10 flex-col justify-between items-center gap-4 overflow-y-auto w-full h-full'>
         <SideBarSections sectionFor='general' content={sideBarContentGenral} />
-        <SideBarSections sectionFor='specials' content={sideBarcontentSpecials} />
+        <SideBarSections
+          sectionFor='specials'
+          content={sideBarcontentSpecials}
+        />
 
         <div className='m-4 p-[0.8px] rounded-xl max-w-sm bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500 relative'>
           <input
@@ -130,10 +129,10 @@ const SideBar = ({ isOpen, setIsOpen }: props) => {
           </svg>
         </div>
         <ul className='text-lg capitalize gap-2 flex flex-col items-start justify-start '>
-          <Link href="/globel">
+          <Link href='/global'>
             <li>🌍 Global </li>
           </Link>
-          <Link href="/indian">
+          <Link href='/indian'>
             <li className='flex cur items-center gap-1 justify-start'>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -168,19 +167,25 @@ const SideBar = ({ isOpen, setIsOpen }: props) => {
         </ul>
       </div>
     </div>
-
   );
 };
 
 export default SideBar;
 
-export const SideBarSections = ({ sectionFor, content }: { sectionFor: string, content: any[] }) => {
+export const SideBarSections = ({
+  sectionFor,
+  content,
+}: {
+  sectionFor: string;
+  content: any[];
+}) => {
   return (
     <div
-      className={`${sectionFor === 'specials'
-        ? 'border-[#CEB9E9] border-y-[0.5px] py-6 px-4 w-[80%]'
-        : ''
-        } flex flex-col gap-4 items-center justify-around`}
+      className={`${
+        sectionFor === 'specials'
+          ? 'border-[#CEB9E9] border-y-[0.5px] py-6 px-4 w-[80%]'
+          : ''
+      } flex flex-col gap-4 items-center justify-around`}
     >
       <p className='capitalize bg-gradient-to-br text-xl lg:text-2xl font-bold from-[#FB0393] from-[0%] to-[#9A3CFF] to-[100%] bg-clip-text text-transparent text-center'>
         {sectionFor}
