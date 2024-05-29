@@ -21,8 +21,8 @@ export const metadata: Metadata = {
   // ! copy to /favicon folder
   icons: {
     icon: '/favicon/favicon.ico',
-    shortcut: '/favicon/favicon-16x16.png',
-    apple: '/favicon/apple-touch-icon.png',
+    shortcut: '/favicon/favicon.ico',
+    apple: '/favicon/favicon.ico',
   },
   manifest: `/favicon/site.webmanifest`,
   openGraph: {
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
     siteName: siteConfig.title,
-    images: [`${siteConfig.url}/images/og.jpg`],
+    images: [`${siteConfig.url}/images/blockTeaseLogo.png`],
     type: 'website',
     locale: 'en_US',
   },
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: siteConfig.title,
     description: siteConfig.description,
-    images: [`${siteConfig.url}/images/og.jpg`],
+    images: [`${siteConfig.url}/images/blockTeaseLogo.png`],
     // creator: '@th_clarence',
   },
   // authors: [
@@ -55,8 +55,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
-      <body>{children}</body>
+    <html >
+      <body className=' ' >{children}</body>
     </html>
   );
 }

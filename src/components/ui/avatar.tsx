@@ -1,0 +1,65 @@
+'use client';
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+
+const Avatar = ({
+  userName,
+  openId,
+  ipfsUrl,
+}: {
+  userName: string;
+  openId: string;
+  ipfsUrl: string;
+}) => {
+  const [teaseData, setTeaseData] = useState({
+    name: '',
+    image: '',
+  });
+
+  useEffect(() => {
+    const fetchTeaseData = async (ipfs: string) => {
+      try {
+        const response = await fetch(ipfs);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const data = await response.json();
+
+        setTeaseData(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    if (ipfsUrl) {
+      fetchTeaseData(ipfsUrl);
+    }
+  }, [ipfsUrl]);
+
+  if (!teaseData) {
+    return <div>Loading...</div>;
+  }
+  return (
+    <a
+      href={`https://testnets.opensea.io/assets/avalanche-fuji/0x82376da85a76360bc9ffc9a542961429a2a653ff/${openId}`}
+      target='_blank'
+      rel='noreferrer'
+      className=' flex flex-col gap-1 items-center justify-center cursor-pointer'
+    >
+      <div className='rounded-full'>
+        <Image
+          src={teaseData.image}
+          alt={teaseData.name}
+          width={50}
+          height={50}
+          className=' rounded-full'
+        />
+      </div>
+
+      <p className='text-[#CEB9E9] text-sm font-semibold'>
+        {teaseData.name}.tease
+      </p>
+    </a>
+  );
+};
+
+export default Avatar;
