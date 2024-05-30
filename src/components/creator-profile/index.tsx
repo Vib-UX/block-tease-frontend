@@ -1,8 +1,13 @@
 'use client';
-import { ethers } from 'ethers';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
-import { balanceOffModel, getModalPayment } from '@/lib/func';
+import useGlobalStore from '@/hooks/useGlobalStore';
+import useWeb3auth from '@/hooks/useWeb3auth';
+import { getModalPayment } from '@/lib/func';
+import { toastStyles } from '@/lib/utils';
+
+import { MarketPlaceCard2 } from '@/components/ui/marketPlaceCard';
 
 import ModelBanner from '@/app/(main)/profile/(components)/banner';
 import ModelFeed from '@/app/(main)/profile/(components)/feed';
@@ -10,10 +15,6 @@ import RightSideBar from '@/app/(main)/profile/(components)/rightSideBar';
 import { Props } from '@/app/(main)/profile/[id]/page';
 import NotFound from '@/app/not-found';
 import { allModelData } from '@/utils/modelData';
-import useWeb3auth from '@/hooks/useWeb3auth';
-import toast from 'react-hot-toast';
-import { toastStyles } from '@/lib/utils';
-import useGlobalStore from '@/hooks/useGlobalStore';
 const CreatorProfile = ({ params }: Props) => {
   const [modelFees, setModelFees] = useState<number>(0);
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
@@ -89,6 +90,12 @@ const CreatorProfile = ({ params }: Props) => {
           modelId={modelData.id}
           isUnlocked={isUnlocked}
           setIsUnlocked={setIsUnlocked}
+        />
+        <div className='h-[20px]' />
+        <MarketPlaceCard2
+          ipfsUrl='https://ipfs.io/ipfs/QmZK5PeA17xdmJv57JdPMD4AHzxGA2Fms1iDuRZQegcpUq/2.json'
+          modelId='2'
+          modelName='Poonam'
         />
       </div>
     </div>
