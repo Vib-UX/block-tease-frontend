@@ -136,38 +136,32 @@ const MarketPlaceCard = ({
 
 export const MarketPlaceCard2 = ({
   modelName,
-  modelId,
-  ipfsUrl,
+  image,
 }: {
   modelName: string;
-  modelId: string;
-  ipfsUrl: string;
+  image: string;
 }) => {
-  const [teaseData, setTeaseData] = useState({
-    name: '',
-    image: '',
-  });
 
   const [buttonText, setButtonText] = useState('Accept the call 📞');
 
 
-  useEffect(() => {
-    const fetchTeaseData = async (ipfs: string) => {
-      try {
-        const response = await fetch(ipfs);
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        const data = await response.json();
-        console.log(data);
-        setTeaseData(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchTeaseData = async (ipfs: string) => {
+  //     try {
+  //       const response = await fetch(ipfs);
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch data');
+  //       }
+  //       const data = await response.json();
+  //       console.log(data);
+  //       setTeaseData(data);
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //     }
+  //   };
 
-    fetchTeaseData(ipfsUrl);
-  }, []);
+  //   fetchTeaseData(ipfsUrl);
+  // }, []);
   return (
     <div className='group wrapper z-10 relative overflow-hidden rounded-xl'>
       <div className='relative z-0 h-[300px]'>
@@ -175,7 +169,7 @@ export const MarketPlaceCard2 = ({
         <Image
           height={200}
           width={200}
-          src={teaseData.image}
+          src={image}
           priority
           alt='model'
           className='absolute top-0 left-0 w-full h-full opacity-20 object-cover rounded-xl transition-opacity duration-300'
@@ -224,9 +218,9 @@ export const MarketPlaceCard2 = ({
         <motion.div
           className=' w-full z-50 p-1  h-full flex flex-col items-center justify-end'
         >
-          <div className='px-3 w-full pb-2'>
+          <div className='px-3 w-full flex items-center justify-center pb-2'>
             <button
-              className={`w-full h-[45px] z-20 relative rounded-xl ${buttonText === 'Accept the call 📞' ? 'bg-green-500 hover:bg-green-600' : 'bg-[#fb0393] hover:bg-opacity-80'} bg-opacity-50`}
+              className={`w-[80%] mx-auto h-[45px] z-20 relative rounded-xl ${buttonText === 'Accept the call 📞' ? 'bg-green-500 hover:bg-green-600' : 'bg-[#fb0393] hover:bg-opacity-80'} bg-opacity-50`}
               onMouseEnter={() => setButtonText('Try your luck 🌟')} // Change text on hover
               onMouseLeave={() => setButtonText('Accept the call 📞')} // Revert text on mouse leave
             >

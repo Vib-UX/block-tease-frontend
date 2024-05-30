@@ -59,6 +59,9 @@ const CreatorProfile = ({ params }: Props) => {
     fetchModalFees();
   }, []);
 
+  console.log(modelData, "modelData");
+
+
   if (!modelData) return <NotFound />;
   return (
     <div className=' text-white   container py-6 mx-auto   grid grid-cols-5'>
@@ -93,9 +96,8 @@ const CreatorProfile = ({ params }: Props) => {
         />
         <div className='h-[20px]' />
         <MarketPlaceCard2
-          ipfsUrl='https://ipfs.io/ipfs/QmZK5PeA17xdmJv57JdPMD4AHzxGA2Fms1iDuRZQegcpUq/2.json'
-          modelId='2'
-          modelName='Poonam'
+          image={modelData.icon.src}
+          modelName={modelData.name.split(" ")[0]}
         />
       </div>
     </div>
