@@ -17,7 +17,7 @@ import UsdcAvaAbi from '../constant/usdcAva.json';
 import UsdcEthSepoliaAbi from '../constant/MockUSD.json';
 import { BiconomySmartAccountV2, PaymasterMode } from '@biconomy/account';
 import { chainConfig } from '@/hooks/useWeb3auth';
-const nftAutomationAddr = '0xD8D9E346Ad32D1f56bC5Fc959440D0A3A2118981';
+const nftAutomationAddr = '0x87555010E191072421d4f4B14E75FB59abE778B0';
 const usdcSepoliaEthAddr = '0x9d24c52916A14afc31D86B5Aa046b252383ee444';
 const purchaseSubscriptionAddress =
   '0xF99b791257ab50be7F235BC825E7d4B83942cf38';

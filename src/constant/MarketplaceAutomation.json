@@ -218,9 +218,9 @@
       },
       {
         "indexed": false,
-        "internalType": "string",
+        "internalType": "bytes",
         "name": "response",
-        "type": "string"
+        "type": "bytes"
       },
       {
         "indexed": false,
@@ -249,6 +249,50 @@
       }
     ],
     "name": "ResponseError",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "beneficiary",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "RoyaltiesPaid",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "subscriptionId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "pausedBy",
+        "type": "address"
+      }
+    ],
+    "name": "SubscriptionPaused",
     "type": "event"
   },
   {
@@ -286,14 +330,21 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "requestId",
-        "type": "bytes32"
+        "indexed": false,
+        "internalType": "address",
+        "name": "luckySubcriber",
+        "type": "address"
       }
     ],
-    "name": "UnexpectedRequestIDError",
+    "name": "luckySubcriberSuccess",
     "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "addressOfVRFContract",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [
@@ -354,6 +405,13 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getSubscriptionsCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       { "internalType": "bytes32", "name": "requestId", "type": "bytes32" },
       { "internalType": "bytes", "name": "response", "type": "bytes" },
@@ -362,13 +420,6 @@
     "name": "handleOracleFulfillment",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lastConfirmationMsg",
-    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -401,6 +452,13 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "luckSubscriberAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "name": "models",
     "outputs": [
@@ -421,6 +479,15 @@
     "name": "owner",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "subscriptionId", "type": "uint256" }
+    ],
+    "name": "pauseSubscription",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -570,6 +637,19 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "randomSubscriptionId",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateLuckySubscriber",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "uint256", "name": "modelId", "type": "uint256" },
       { "internalType": "uint256", "name": "priceUSD", "type": "uint256" },
       {
@@ -587,13 +667,9 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "newPaymentTokenAddress",
-        "type": "address"
-      }
+      { "internalType": "address", "name": "newVrfContract", "type": "address" }
     ],
-    "name": "updatePaymentToken",
+    "name": "updateVrfContractAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
