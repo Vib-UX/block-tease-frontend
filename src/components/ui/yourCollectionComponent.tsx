@@ -39,10 +39,10 @@ const YourCollection = () => {
   };
   const { smartAddress } = useGlobalStore();
   React.useEffect(() => {
-    // if (smartAddress) {
-    //   fetchStatus(smartAddress);
-    // }
-    fetchStatus('0x452A3C497e3594aBe772b864E2031408c6B3a48e');
+    if (smartAddress) {
+      fetchStatus(smartAddress);
+    }
+    // fetchStatus('0x452A3C497e3594aBe772b864E2031408c6B3a48e');
   }, []);
   return (
     <div className=' w-full  text-white '>
