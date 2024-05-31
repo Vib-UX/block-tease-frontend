@@ -47,7 +47,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
   const [openAiId, setOpenAiId] = useState('');
   const [ipfsUrl, setIpfsUrl] = useState('');
   const [avatarLoading, setAvatarLoading] = useState(false);
-  const createNft = async () => {
+  const createNft = async (name: string) => {
     try {
       const res = await fetch(
         'https://open-ai-avatar-nft-gen.onrender.com/generate-avatar-openAI',
@@ -100,7 +100,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
             );
             const data = await reps.json();
             if (data.success) {
-              fetchUserDetails(smartAddress || '');
+              fetchUserDetails(smartAddress || '', name);
             }
           }
         }
@@ -120,7 +120,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
         toast.success('Something went wrong', toastStyles);
       });
   };
-  const fetchUserDetails = async (address: string) => {
+  const fetchUserDetails = async (address: string, name: string) => {
     try {
       setAvatarLoading(true);
       const resp = await fetch(
@@ -136,7 +136,8 @@ const Header = ({ isOpen, setIsOpen }: props) => {
         setIpfsUrl(data.data.user.ipfs_url);
       } else if (data.message === 'User not found') {
         //call here
-        createNft();
+
+        createNft(name);
       }
     } catch (error) {
       setAvatarLoading(false);
@@ -148,10 +149,10 @@ const Header = ({ isOpen, setIsOpen }: props) => {
     // if (loggedIn && name && localStorage.getItem(name) === null) {
     //   fetchNft();
     // }
-    if (smartAddress) {
-      fetchUserDetails(smartAddress);
+    if (smartAddress && name) {
+      fetchUserDetails(smartAddress, name);
     }
-  }, [smartAddress]);
+  }, [smartAddress, name]);
   return (
     <div className='w-full flex items-center justify-between bg-[#130D1A] px-6 py-4 lg:py-6 fixed top-0 z-50'>
       <div className='text-white lg:hidden'>
