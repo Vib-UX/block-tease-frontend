@@ -18,10 +18,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     // description: product.data.description,
     openGraph: {
+      title: `${modelData.name} | BlockTease`,
       images: modelData.image.src,
       description: modelData.AboutMe,
     },
     twitter: {
+      title: `${modelData.name} | BlockTease`,
       images: modelData.image.src,
       description: modelData.AboutMe,
     },
