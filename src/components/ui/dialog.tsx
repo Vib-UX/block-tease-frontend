@@ -227,7 +227,7 @@ export default function MyModal({
     if (walletChosen !== '') {
       insufficiantBalance();
     }
-  }, []);
+  }, [walletChosen]);
   return (
     <>
       <button

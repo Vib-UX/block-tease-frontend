@@ -1,7 +1,7 @@
 export function usdcToEth(usdcAmount: number) {
   const conversionRate = 0.00045; // 1 USDC = 0.00045 ETH
   const ethAmount = usdcAmount * conversionRate;
-  return parseFloat(ethAmount.toFixed(3));
+  return parseFloat(ethAmount.toFixed(4));
 }
 export function usdcToAvax(usdcAmount: number) {
   const conversionRate = 0.029; // 1 USDC = 0.029 AVAX
