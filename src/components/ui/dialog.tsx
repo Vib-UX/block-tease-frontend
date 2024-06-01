@@ -13,14 +13,13 @@ import toast from 'react-hot-toast';
 import useWeb3auth, { chainConfig } from '@/hooks/useWeb3auth';
 import {
   PurchaseSubsAvaGasslessBundle,
-  PurchaseSubsPolygon,
+  PurchaseSubsAmoyGasslessBundle,
   approveNSubscribe,
   batchSubscribeFor,
   chainLinkAutomationSubscription,
   checkUserBalanceAvaWeb3Auth,
-  checkUserBalancePolygonWeb3Auth,
+  checkUserBalanceAmoyWeb3Auth,
   checkUserBalanceWeb3Auth,
-  getPolygonFundsWeb3Auth,
   getTestFundsWeb3Auth,
   mintingNft,
 } from '@/lib/func';
@@ -214,7 +213,7 @@ export default function MyModal({
         }
       } else if (walletChosen === 'Polygon') {
         setProgress(10);
-        const resp = await PurchaseSubsPolygon(
+        const resp = await PurchaseSubsAmoyGasslessBundle(
           smartAccount,
           modelId,
           subscriptionId,
@@ -253,8 +252,8 @@ export default function MyModal({
     }
   };
 
-  const insufficiantPolygonBalance = async () => {
-    const amount = await checkUserBalancePolygonWeb3Auth(smartAccount);
+  const insufficiantAmoyBalance = async () => {
+    const amount = await checkUserBalanceAmoyWeb3Auth(smartAccount);
     if (parseInt(amount.signerBalance) < value) {
       setLoadingState(
         `Insufficient Funds need ${
@@ -270,7 +269,8 @@ export default function MyModal({
     } else if (walletChosen === 'avalanche') {
       insufficiantAvaBalance();
     } else if (walletChosen === 'Polygon') {
-      insufficiantPolygonBalance();
+      console.log('there?');
+      insufficiantAmoyBalance();
     }
   }, [walletChosen]);
   return (
@@ -509,6 +509,7 @@ export default function MyModal({
                                 } else if (coin.name === 'Ethereum') {
                                   login(1);
                                 } else if (coin.name === 'Polygon') {
+                                  console.log('there?');
                                   login(2);
                                 }
                                 setWalletChosen(coin.name);
@@ -582,24 +583,6 @@ export default function MyModal({
                                   toastStyles
                                 );
                                 setTestTokensHash('');
-                              }
-                            } else if (walletChosen === 'Polygon') {
-                              const resp = await getPolygonFundsWeb3Auth(
-                                smartAccount
-                              );
-                              if (resp.trxhash) {
-                                toast.success(
-                                  'Wooho your funds have arrived 🚀🎉💸',
-                                  toastStyles
-                                );
-                                setPolygonTokensHash(resp.trxhash);
-                                setLoadingState('Confirm Payment');
-                              } else {
-                                toast.error(
-                                  'Something went wrong',
-                                  toastStyles
-                                );
-                                setPolygonTokensHash('');
                               }
                             } else {
                               window.open(

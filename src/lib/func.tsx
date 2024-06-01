@@ -6,6 +6,7 @@ import userOnBoardingAbi from '../constant/userOnBoarding.json';
 import batchAbi from '../constant/Batch.json';
 import mockUsdAbi from '../constant/MockUSD.json';
 import purchaseSubsAvaAbi from '../constant/purchaseSubsAva.json';
+import purchaseSubsAmoyAbi from '../constant/PurchaseSubscriptionAmoy.json';
 import nftAbi from '../constant/nft.json';
 import nftMarketPlaceSepoliaAbi from '../constant/NftMarketPlaceSepolia.json';
 import NftsMarketPlaceMoonAbi from '../constant/nftsMarketPlaceAbi.json';
@@ -24,8 +25,10 @@ const purchaseSubscriptionAddress =
 const purchaseSubscriptionAddressMorph =
   '0xF99b791257ab50be7F235BC825E7d4B83942cf38';
 const purchaseSubsAva = '0xf6b6A9EFAFd008b1170D703C32Fe32C0dA92fc2F';
+const purhcaseSubsAmoy = '0xa52309ed1de8781cbeecef9d05b4b09b209b2493';
 // const usdcAvaAddr = '0x6F3c4787bAB4EeEbf62eFB8C35Dc9259FDc9D9f4';
 const usdcAvaAddr = '0x5425890298aed601595a70AB815c96711a31Bc65';
+const usdcAmoyAddr = '0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582';
 const mockUsdAddress = '0xf7409b94F7285d27Ab1A456638A1110A4E55bFEC';
 const userOnboardingAddress = '0x82376dA85a76360BC9FfC9a542961429A2A653ff';
 const batchAddress = '0x0000000000000000000000000000000000000808';
@@ -410,13 +413,13 @@ export async function checkUserBalanceAvaWeb3Auth(smartAccount: any) {
 
   return { signerBalance };
 }
-//check user balance with polygon
-export async function checkUserBalancePolygonWeb3Auth(smartAccount: any) {
+//check user balance with amoy
+export async function checkUserBalanceAmoyWeb3Auth(smartAccount: any) {
   const provider = new ethers.providers.JsonRpcProvider(
-    'https://rpc.ankr.com/avalanche_fuji'
+    'https://rpc-amoy.polygon.technology'
   );
   const signerAddress = await smartAccount.getAddress();
-  const usdc = new ethers.Contract(usdcAvaAddr, UsdcAvaAbi, provider);
+  const usdc = new ethers.Contract(usdcAmoyAddr, UsdcAvaAbi, provider);
   const signerBalance = ethers.utils.formatUnits(
     await usdc.balanceOf(signerAddress),
     8
@@ -458,25 +461,7 @@ export async function getTestFundsWeb3Auth(smartAccount: any) {
   const trx = await usdc.transfer(signerAddress, 100e8);
   return { trxhash: trx.hash };
 }
-//get test polygon funds
-export async function getPolygonFundsWeb3Auth(smartAccount: any) {
-  const provider = new ethers.providers.JsonRpcProvider(
-    'https://eth-sepolia.public.blastapi.io'
-  );
-  const signerAddress = await smartAccount.getAddress();
-  const thirdPartyProvider = new ethers.Wallet(
-    process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
-    provider
-  );
-  console.log(thirdPartyProvider);
-  const usdc = new ethers.Contract(
-    usdcSepoliaEthAddr,
-    UsdcEthSepoliaAbi,
-    thirdPartyProvider
-  );
-  const trx = await usdc.transfer(signerAddress, 100e8);
-  return { trxhash: trx.hash };
-}
+
 export async function balanceOffModel(provider: any, modelId: string) {
   const signer = provider.getSigner();
   const signerAddress = await signer.getAddress();
@@ -902,20 +887,20 @@ export async function PurchaseSubsAvaGasslessBundle(
     console.error('Error in PurchaseSubsAvaGasslessBundle', error);
   }
 }
-//this is contract call one when user presses confirm with polygon
-export async function PurchaseSubsPolygon(
+//this is contract call one when user presses confirm with Amoy
+export async function PurchaseSubsAmoyGasslessBundle(
   smartAccount: any,
   modelId: number,
   subscriptionId: number,
   priceInUsd: number
 ) {
-  console.log('Starting PurchaseSubsAvaGasslessBundle');
+  console.log('Starting PurchaseSubsAmoyGasslessBundle');
   console.log(`SmartAccount provided: ${smartAccount}`);
   try {
-    const usdcContractAddress = usdcAvaAddr;
-    const purchaseSubAddress = purchaseSubsAva;
+    const usdcContractAddress = usdcAmoyAddr;
+    const purchaseSubAddress = purhcaseSubsAmoy;
     const provider = new ethers.providers.JsonRpcProvider(
-      'https://api.avax-test.network/ext/bc/C/rpc'
+      'https://rpc-amoy.polygon.technology'
     );
     console.log('Provider initialized');
 
@@ -926,7 +911,7 @@ export async function PurchaseSubsPolygon(
     );
     console.log('USDC Contract instance created');
 
-    const approvalUsdcAmount = priceInUsd * 3;
+    const approvalUsdcAmount = priceInUsd;
     const approvePriceInUsdc = ethers.utils.parseUnits(
       approvalUsdcAmount.toString(),
       6
@@ -949,7 +934,7 @@ export async function PurchaseSubsPolygon(
     // Step 2: Create and call sendUsdcCrossChainNFTMint on the purchaseSub contract
     const purchaseSubInstance = new ethers.Contract(
       purchaseSubAddress,
-      purchaseSubsAvaAbi,
+      purchaseSubsAmoyAbi,
       provider
     );
     console.log('Purchase Subscription Contract instance created');
