@@ -16,6 +16,7 @@ import nftAutomationAbi from '../constant/MarketplaceAutomation.json';
 //const provider = new ethers.providers.Web3Provider(window.ethereum);
 import UsdcAvaAbi from '../constant/usdcAva.json';
 import UsdcEthSepoliaAbi from '../constant/MockUSD.json';
+import blockTeaseNftAbi from '../constant/blockTeaseNft.json';
 import { BiconomySmartAccountV2, PaymasterMode } from '@biconomy/account';
 import { chainConfig } from '@/hooks/useWeb3auth';
 const nftAutomationAddr = '0x87555010E191072421d4f4B14E75FB59abE778B0';
@@ -26,6 +27,7 @@ const purchaseSubscriptionAddressMorph =
   '0xF99b791257ab50be7F235BC825E7d4B83942cf38';
 const purchaseSubsAva = '0xf6b6A9EFAFd008b1170D703C32Fe32C0dA92fc2F';
 const purhcaseSubsAmoy = '0xa52309ed1de8781cbeecef9d05b4b09b209b2493';
+const blockTeaseNftAddr = '0xc96b21eDA35A43eFfc57d459688e066315106f59';
 // const usdcAvaAddr = '0x6F3c4787bAB4EeEbf62eFB8C35Dc9259FDc9D9f4';
 const usdcAvaAddr = '0x5425890298aed601595a70AB815c96711a31Bc65';
 const usdcAmoyAddr = '0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582';
@@ -1059,4 +1061,105 @@ export async function chainLinkAutomationSubscription(
   } catch (error) {
     console.error('Error in PurchaseSubscription in nftAutomation', error);
   }
+}
+
+async function listNft(smartAccount: any, tokenId: any, priceInUsd: any) {
+  console.log('Starting listNft');
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://eth-sepolia.public.blastapi.io'
+  );
+  const nftContractInstance = new ethers.Contract(
+    blockTeaseNftAddr,
+    blockTeaseNftAbi,
+    provider
+  );
+  const marketplaceContractInstance = new ethers.Contract(
+    nftAutomationAddr,
+    nftAutomationAbi,
+    provider
+  );
+
+  console.log(`Listing NFT with ID: ${tokenId} at price: ${priceInUsd} USD`);
+
+  // Step 1: Approve the marketplace contract to manage the NFT
+  const approvalTx =
+    await nftContractInstance.populateTransaction.setApprovalForAll(
+      nftAutomationAddr,
+      true
+    );
+  const approvalTransaction = { to: blockTeaseNftAddr, data: approvalTx.data };
+  console.log('Approval transaction for NFT transfer created');
+
+  // Step 2: Create the listing transaction
+  const priceInWei = ethers.utils.parseUnits(priceInUsd.toString(), 'ether');
+  const listTx = await marketplaceContractInstance.populateTransaction.listNft(
+    tokenId,
+    priceInWei
+  );
+  const listTransaction = { to: nftAutomationAddr, data: listTx.data };
+  console.log('NFT listing transaction created');
+
+  // Bundle transactions
+  const transactions = [approvalTransaction, listTransaction];
+  console.log('Transactions bundled', transactions);
+
+  // Send Transactions
+  console.log('Sending bundled transactions through SmartAccount...');
+  const bundleTransaction = await smartAccount.sendTransaction(transactions, {
+    paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+  });
+  console.log('Bundle transaction sent');
+
+  const { transactionHash } = await bundleTransaction.waitForTxHash();
+  console.log('Listing Transaction Hash:', transactionHash);
+
+  return { hash: transactionHash };
+}
+
+export async function buyNft(
+  smartAccount: any,
+  listingId: any,
+  priceInUsd: any
+) {
+  console.log('Starting buyNft');
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://eth-sepolia.public.blastapi.io'
+  );
+  const usdcContractInstance = new ethers.Contract(
+    usdcSepoliaEthAddr,
+    UsdcEthSepoliaAbi,
+    provider
+  );
+  const nftMarketplaceInstance = new ethers.Contract(
+    nftAutomationAddr,
+    nftAutomationAbi,
+    provider
+  );
+
+  const approvalUsdc = ethers.utils.parseUnits(priceInUsd.toString(), 8);
+  console.log(`Approving USDC: ${approvalUsdc}`);
+
+  // Approve USDC spending
+  const approvalTx = await usdcContractInstance.populateTransaction.approve(
+    nftAutomationAddr,
+    approvalUsdc
+  );
+  const approvalTransaction = { to: usdcSepoliaEthAddr, data: approvalTx.data };
+
+  // Buy NFT
+  const buyTx = await nftMarketplaceInstance.populateTransaction.buyNft(
+    listingId
+  );
+  const buyTransaction = { to: nftAutomationAddr, data: buyTx.data };
+
+  // Send Transactions
+  const transactions = [approvalTransaction, buyTransaction];
+  console.log('Sending bundled transactions through SmartAccount...');
+  const bundleTransaction = await smartAccount.sendTransaction(transactions, {
+    paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+  });
+
+  const { transactionHash } = await bundleTransaction.waitForTxHash();
+  console.log('Transaction Hash:', transactionHash);
+  return { hash: transactionHash };
 }
