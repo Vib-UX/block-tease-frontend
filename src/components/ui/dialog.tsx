@@ -397,11 +397,7 @@ export default function MyModal({
                         </div>
                       )}
                       {testTokensHash && (
-                        <div
-                          className={`${
-                            !nftTrx && 'mt-20'
-                          } 'flex items-center w-full py-3'`}
-                        >
+                        <div className={'flex items-center w-full'}>
                           <a
                             href={`${chainConfig[1].blockExplorerUrl}/tx/${testTokensHash}`}
                             target='_blank'
