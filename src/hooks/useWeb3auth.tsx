@@ -33,6 +33,15 @@ export const chainConfig = [
     ticker: 'ETH',
     tickerName: 'Ethereum',
   },
+  {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    chainId: '0x13882', // hex of 43114
+    rpcTarget: 'https://rpc-amoy.polygon.technology',
+    displayName: 'Polygon Amoy',
+    blockExplorerUrl: 'https://www.oklink.com/amoy',
+    ticker: 'MATIC',
+    tickerName: 'Polygon Matic',
+  },
 ];
 
 const config = [
@@ -46,6 +55,11 @@ const config = [
     bundlerUrl: `https://bundler.biconomy.io/api/v2/11155111/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44`,
     chainId: 11155111,
   },
+  {
+    biconomyPaymasterApiKey: '8jJqj9r_q.5c04862e-d262-4f69-bb88-ddc7c4d991f0',
+    bundlerUrl: `https://bundler.biconomy.io/api/v2/80002/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44`,
+    chainId: 80002,
+  },
 ];
 
 const privateKeyProvider: any = new EthereumPrivateKeyProvider({
@@ -55,6 +69,11 @@ const web3auth = new Web3Auth({
   clientId,
   web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
   privateKeyProvider,
+  uiConfig: {
+    appName: 'BlockTease',
+    mode: 'dark',
+    defaultLanguage: 'en',
+  },
 });
 const metamaskAdapter = new MetamaskAdapter({
   clientId,

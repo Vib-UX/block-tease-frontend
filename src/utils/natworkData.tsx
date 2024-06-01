@@ -1,38 +1,41 @@
-import { avalancheIcon, ethereumIcon, meticIcon, moonbeamIcon, morphIcon, polygonIcon, zksyncIcon } from '~/NetworkIcon';
+import {
+  avalancheIcon,
+  ethereumIcon,
+  meticIcon,
+  moonbeamIcon,
+  morphIcon,
+  polygonIcon,
+  zksyncIcon,
+} from '~/NetworkIcon';
 
 export const coinData = [
   {
-    name: "avalanche",
-    icon: avalancheIcon
-
+    name: 'avalanche',
+    icon: avalancheIcon,
   },
   {
-    name: "Ethereum",
-    icon: ethereumIcon
-
+    name: 'Ethereum',
+    icon: ethereumIcon,
   },
   {
-    name: "Moonbeam",
-    icon: moonbeamIcon
-
+    name: 'Polygon',
+    icon: polygonIcon,
   },
   {
-    name: "Polygon",
-    icon: polygonIcon
+    name: 'Moonbeam',
+    icon: moonbeamIcon,
+  },
+
+  {
+    name: 'Metis',
+    icon: meticIcon,
   },
   {
-    name: "Metis",
-    icon: meticIcon
-
+    name: 'ZkSync',
+    icon: zksyncIcon,
   },
   {
-    name: "ZkSync",
-    icon: zksyncIcon
-
+    name: 'Morph',
+    icon: morphIcon,
   },
-  {
-    name: "Morph",
-    icon: morphIcon
-
-  },
-]
+];

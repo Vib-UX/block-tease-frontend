@@ -410,6 +410,20 @@ export async function checkUserBalanceAvaWeb3Auth(smartAccount: any) {
 
   return { signerBalance };
 }
+//check user balance with polygon
+export async function checkUserBalancePolygonWeb3Auth(smartAccount: any) {
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://rpc.ankr.com/avalanche_fuji'
+  );
+  const signerAddress = await smartAccount.getAddress();
+  const usdc = new ethers.Contract(usdcAvaAddr, UsdcAvaAbi, provider);
+  const signerBalance = ethers.utils.formatUnits(
+    await usdc.balanceOf(signerAddress),
+    8
+  );
+
+  return { signerBalance };
+}
 export async function getTestFunds(provider: any) {
   const signer = provider.getSigner();
   const signerAddress = await signer.getAddress();
@@ -427,6 +441,25 @@ export async function getTestFunds(provider: any) {
   return { trxhash: trx.hash };
 }
 export async function getTestFundsWeb3Auth(smartAccount: any) {
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://eth-sepolia.public.blastapi.io'
+  );
+  const signerAddress = await smartAccount.getAddress();
+  const thirdPartyProvider = new ethers.Wallet(
+    process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
+    provider
+  );
+  console.log(thirdPartyProvider);
+  const usdc = new ethers.Contract(
+    usdcSepoliaEthAddr,
+    UsdcEthSepoliaAbi,
+    thirdPartyProvider
+  );
+  const trx = await usdc.transfer(signerAddress, 100e8);
+  return { trxhash: trx.hash };
+}
+//get test polygon funds
+export async function getPolygonFundsWeb3Auth(smartAccount: any) {
   const provider = new ethers.providers.JsonRpcProvider(
     'https://eth-sepolia.public.blastapi.io'
   );
@@ -778,6 +811,99 @@ export async function PurchaseSubsAva(provider: any) {
 }
 
 export async function PurchaseSubsAvaGasslessBundle(
+  smartAccount: any,
+  modelId: number,
+  subscriptionId: number,
+  priceInUsd: number
+) {
+  console.log('Starting PurchaseSubsAvaGasslessBundle');
+  console.log(`SmartAccount provided: ${smartAccount}`);
+  try {
+    const usdcContractAddress = usdcAvaAddr;
+    const purchaseSubAddress = purchaseSubsAva;
+    const provider = new ethers.providers.JsonRpcProvider(
+      'https://api.avax-test.network/ext/bc/C/rpc'
+    );
+    console.log('Provider initialized');
+
+    const usdcContractInstance = new ethers.Contract(
+      usdcContractAddress,
+      UsdcAvaAbi,
+      provider
+    );
+    console.log('USDC Contract instance created');
+
+    const approvalUsdcAmount = priceInUsd * 3;
+    const approvePriceInUsdc = ethers.utils.parseUnits(
+      approvalUsdcAmount.toString(),
+      6
+    );
+    console.log(`Approval Price in USDC: ${approvePriceInUsdc}`);
+
+    // Step 1: Approve the purchaseSub contract to spend USDC
+    const approvalTx = await usdcContractInstance.populateTransaction.approve(
+      purchaseSubAddress,
+      approvePriceInUsdc
+    );
+    console.log('Approval transaction created');
+
+    const approvalTransaction = {
+      to: usdcContractAddress,
+      data: approvalTx.data,
+    };
+    console.log(`Approval Transaction Data: ${approvalTransaction.data}`);
+
+    // Step 2: Create and call sendUsdcCrossChainNFTMint on the purchaseSub contract
+    const purchaseSubInstance = new ethers.Contract(
+      purchaseSubAddress,
+      purchaseSubsAvaAbi,
+      provider
+    );
+    console.log('Purchase Subscription Contract instance created');
+
+    // We are going to select the ethereum chain
+    const transferPrice = ethers.utils.parseUnits(priceInUsd.toString(), 6);
+    const destinationSelector = ethers.BigNumber.from('16015286601757825753');
+    console.log(`Destination Selector: ${destinationSelector}`);
+
+    const mintTx =
+      await purchaseSubInstance.populateTransaction.sendUsdcCrossChainNFTMint(
+        destinationSelector,
+        nftAutomationAddr,
+        modelId,
+        subscriptionId,
+        3600,
+        transferPrice
+      );
+    console.log('Mint transaction created');
+
+    const subTransaction = {
+      to: purchaseSubAddress,
+      data: mintTx.data,
+    };
+    console.log(`Subscription Transaction Data: ${subTransaction.data}`);
+
+    const txs = [approvalTransaction, subTransaction];
+    console.log('Transactions bundled', txs);
+
+    console.log('Sending bundle transaction through SmartAccount...');
+    const bundleTransaction = await smartAccount?.sendTransaction(txs, {
+      paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+    });
+    console.log('Bundle transaction sent');
+
+    const { transactionHash } = await bundleTransaction.waitForTxHash();
+    console.log('Final Transaction Hash', transactionHash);
+
+    if (transactionHash) {
+      return { hash: transactionHash };
+    }
+  } catch (error) {
+    console.error('Error in PurchaseSubsAvaGasslessBundle', error);
+  }
+}
+//this is contract call one when user presses confirm with polygon
+export async function PurchaseSubsPolygon(
   smartAccount: any,
   modelId: number,
   subscriptionId: number,

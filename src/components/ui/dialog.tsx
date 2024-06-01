@@ -13,11 +13,14 @@ import toast from 'react-hot-toast';
 import useWeb3auth, { chainConfig } from '@/hooks/useWeb3auth';
 import {
   PurchaseSubsAvaGasslessBundle,
+  PurchaseSubsPolygon,
   approveNSubscribe,
   batchSubscribeFor,
   chainLinkAutomationSubscription,
   checkUserBalanceAvaWeb3Auth,
+  checkUserBalancePolygonWeb3Auth,
   checkUserBalanceWeb3Auth,
+  getPolygonFundsWeb3Auth,
   getTestFundsWeb3Auth,
   mintingNft,
 } from '@/lib/func';
@@ -51,9 +54,11 @@ export default function MyModal({
   const [walletChosen, setWalletChosen] = useState('');
   const [batchGaslessTrx, setBatchGaslessTrx] = useState('');
   const [approvetrx, setApproveTrx] = useState('');
+  const [Polygontrx, setPolygonTrx] = useState('');
   const [avalancheCrossTxn, setAvalancheCrossTxn] = useState('');
   const [chainlinkCrossTxn, setChainLinkCrossTxn] = useState('');
   const [testTokensHash, setTestTokensHash] = useState('');
+  const [polygonTokensHash, setPolygonTokensHash] = useState('');
   const [nftTrx, setNftTrx] = useState('');
   const [progress, setProgress] = React.useState(0);
 
@@ -207,6 +212,20 @@ export default function MyModal({
           setProgress(100);
           // }
         }
+      } else if (walletChosen === 'Polygon') {
+        setProgress(10);
+        const resp = await PurchaseSubsPolygon(
+          smartAccount,
+          modelId,
+          subscriptionId,
+          value
+        );
+        if (resp?.hash) {
+          await chainLinkNotifier();
+          setPolygonTrx(resp?.hash);
+          showMsgs();
+          setProgress(100);
+        }
       }
     } catch (error) {
       setProgress(0);
@@ -234,11 +253,24 @@ export default function MyModal({
     }
   };
 
+  const insufficiantPolygonBalance = async () => {
+    const amount = await checkUserBalancePolygonWeb3Auth(smartAccount);
+    if (parseInt(amount.signerBalance) < value) {
+      setLoadingState(
+        `Insufficient Funds need ${
+          value - parseInt(amount.signerBalance)
+        }💸 to subscribe`
+      );
+    }
+  };
+
   React.useEffect(() => {
     if (walletChosen === 'Ethereum') {
       insufficiantBalance();
     } else if (walletChosen === 'avalanche') {
       insufficiantAvaBalance();
+    } else if (walletChosen === 'Polygon') {
+      insufficiantPolygonBalance();
     }
   }, [walletChosen]);
   return (
@@ -318,7 +350,8 @@ export default function MyModal({
                         batchGaslessTrx ||
                         nftTrx ||
                         avalancheCrossTxn ||
-                        chainlinkCrossTxn) && (
+                        chainlinkCrossTxn ||
+                        Polygontrx) && (
                         <div
                           className={`flex items-center ${
                             batchGaslessTrx
@@ -332,6 +365,8 @@ export default function MyModal({
                                 ? `${morph.explorerUrl}/tx/${approvetrx}`
                                 : walletChosen === 'avalanche'
                                 ? `https://ccip.chain.link/tx/${avalancheCrossTxn}`
+                                : walletChosen === 'Polygon'
+                                ? `https://ccip.chain.link/tx/${Polygontrx}`
                                 : walletChosen === 'Ethereum'
                                 ? `${chainConfig[1].blockExplorerUrl}/tx/${chainlinkCrossTxn}`
                                 : `${moonbase.explorerUrl}/tx/${batchGaslessTrx}`
@@ -341,6 +376,9 @@ export default function MyModal({
                           >
                             {walletChosen === 'Ethereum'
                               ? 'Autopay Success'
+                              : walletChosen === 'avalanche' ||
+                                walletChosen === 'Polygon'
+                              ? 'CCIP Payment Success'
                               : ' Payment Success'}
                             <svg
                               stroke='currentColor'
@@ -427,6 +465,37 @@ export default function MyModal({
                           </a>
                         </div>
                       )}
+                      {polygonTokensHash && (
+                        <div className={'flex items-center w-full'}>
+                          <a
+                            href={`${chainConfig[2].blockExplorerUrl}/tx/${polygonTokensHash}`}
+                            target='_blank'
+                            className='flex items-center text-white gap-1 hover:underline'
+                          >
+                            Test funds{' '}
+                            <svg
+                              stroke='currentColor'
+                              fill='none'
+                              stroke-width='2'
+                              viewBox='0 0 24 24'
+                              stroke-linecap='round'
+                              stroke-linejoin='round'
+                              height='1em'
+                              width='1em'
+                              xmlns='http://www.w3.org/2000/svg'
+                            >
+                              <path
+                                stroke='none'
+                                d='M0 0h24v24H0z'
+                                fill='none'
+                              ></path>
+                              <path d='M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6'></path>
+                              <path d='M11 13l9 -9'></path>
+                              <path d='M15 4h5v5'></path>
+                            </svg>
+                          </a>
+                        </div>
+                      )}
                     </div>
 
                     <div className='space-y-4'>
@@ -439,6 +508,8 @@ export default function MyModal({
                                   login(0);
                                 } else if (coin.name === 'Ethereum') {
                                   login(1);
+                                } else if (coin.name === 'Polygon') {
+                                  login(2);
                                 }
                                 setWalletChosen(coin.name);
                               }}
@@ -510,6 +581,24 @@ export default function MyModal({
                                   toastStyles
                                 );
                                 setTestTokensHash('');
+                              }
+                            } else if (walletChosen === 'Polygon') {
+                              const resp = await getPolygonFundsWeb3Auth(
+                                smartAccount
+                              );
+                              if (resp.trxhash) {
+                                toast.success(
+                                  'Wooho your funds have arrived 🚀🎉💸',
+                                  toastStyles
+                                );
+                                setPolygonTokensHash(resp.trxhash);
+                                setLoadingState('Confirm Payment');
+                              } else {
+                                toast.error(
+                                  'Something went wrong',
+                                  toastStyles
+                                );
+                                setPolygonTokensHash('');
                               }
                             } else {
                               window.open(
