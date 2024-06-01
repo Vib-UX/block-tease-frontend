@@ -397,6 +397,19 @@ export async function checkUserBalanceWeb3Auth(smartAccount: any) {
 
   return { signerBalance };
 }
+export async function checkUserBalanceAvaWeb3Auth(smartAccount: any) {
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://rpc.ankr.com/avalanche_fuji'
+  );
+  const signerAddress = await smartAccount.getAddress();
+  const usdc = new ethers.Contract(usdcAvaAddr, UsdcAvaAbi, provider);
+  const signerBalance = ethers.utils.formatUnits(
+    await usdc.balanceOf(signerAddress),
+    8
+  );
+
+  return { signerBalance };
+}
 export async function getTestFunds(provider: any) {
   const signer = provider.getSigner();
   const signerAddress = await signer.getAddress();

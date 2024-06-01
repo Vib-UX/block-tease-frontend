@@ -16,6 +16,7 @@ import {
   approveNSubscribe,
   batchSubscribeFor,
   chainLinkAutomationSubscription,
+  checkUserBalanceAvaWeb3Auth,
   checkUserBalanceWeb3Auth,
   getTestFundsWeb3Auth,
   mintingNft,
@@ -177,19 +178,18 @@ export default function MyModal({
         }
       } else if (walletChosen === 'avalanche') {
         setProgress(10);
-        // console.log('ava selected?');
-        console.log(smartAccount, 'smartAccount');
-        // const resp = await PurchaseSubsAva(Authprovider);
         const resp = await PurchaseSubsAvaGasslessBundle(
           smartAccount,
           modelId,
           subscriptionId,
           value
         );
-        console.log(resp);
-        setAvalancheCrossTxn(resp?.hash);
-        showMsgs();
-        setProgress(100);
+        if (resp?.hash) {
+          await chainLinkNotifier();
+          setAvalancheCrossTxn(resp?.hash);
+          showMsgs();
+          setProgress(100);
+        }
       } else if (walletChosen === 'Ethereum') {
         setProgress(10);
         const resp = await chainLinkAutomationSubscription(
@@ -200,7 +200,7 @@ export default function MyModal({
         );
         login(1);
         if (resp?.hash) {
-          const res = await chainLinkNotifier();
+          await chainLinkNotifier();
           // if (res) {
           setChainLinkCrossTxn(resp.hash);
           showMsgs();
@@ -219,13 +219,26 @@ export default function MyModal({
       setLoadingState(
         `Insufficient Funds need ${
           value - parseInt(amount.signerBalance)
+        } 💸 to subscribe`
+      );
+    }
+  };
+  const insufficiantAvaBalance = async () => {
+    const amount = await checkUserBalanceAvaWeb3Auth(smartAccount);
+    if (parseInt(amount.signerBalance) < value) {
+      setLoadingState(
+        `Insufficient Funds need ${
+          value - parseInt(amount.signerBalance)
         }💸 to subscribe`
       );
     }
   };
+
   React.useEffect(() => {
-    if (walletChosen !== '') {
+    if (walletChosen === 'Ethereum') {
       insufficiantBalance();
+    } else if (walletChosen === 'avalanche') {
+      insufficiantAvaBalance();
     }
   }, [walletChosen]);
   return (
@@ -484,19 +497,29 @@ export default function MyModal({
                         <div
                           className='text-end hover:underline cursor-pointer text-white'
                           onClick={async () => {
-                            const resp = await getTestFundsWeb3Auth(
-                              smartAccount
-                            );
-                            if (resp.trxhash) {
-                              toast.success(
-                                'Wooho your funds have arrived 🚀🎉💸',
-                                toastStyles
+                            if (walletChosen === 'Ethereum') {
+                              const resp = await getTestFundsWeb3Auth(
+                                smartAccount
                               );
-                              setTestTokensHash(resp.trxhash);
-                              setLoadingState('Confirm Payment');
+                              if (resp.trxhash) {
+                                toast.success(
+                                  'Wooho your funds have arrived 🚀🎉💸',
+                                  toastStyles
+                                );
+                                setTestTokensHash(resp.trxhash);
+                                setLoadingState('Confirm Payment');
+                              } else {
+                                toast.error(
+                                  'Something went wrong',
+                                  toastStyles
+                                );
+                                setTestTokensHash('');
+                              }
                             } else {
-                              toast.error('Something went wrong', toastStyles);
-                              setTestTokensHash('');
+                              window.open(
+                                'https://faucet.circle.com/',
+                                '_blank'
+                              );
                             }
                           }}
                         >
