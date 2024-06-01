@@ -1,133 +1,136 @@
-# Next.js + Tailwind CSS + TypeScript Starter and Boilerplate
+# 💘 BlockTease 💌
+Welcome to **BlockTease** — the ultimate fusion of **OnlyFans'** 🕊 charm with the transformative power of Web3! 🚀🌐 Dive into a world where privacy, decentralization, and seamless interactions are not just ideals but vibrant realities.
 
-<div align="center">
-  <h2>🔋 ts-nextjs-tailwind-starter</h2>
-  <p>Next.js + Tailwind CSS + TypeScript starter packed with useful development features.</p>
-  <p>Made by <a href="https://theodorusclarence.com">Theodorus Clarence</a></p>
+![image](https://github.com/BlockTease-BlockMagic/Backend/assets/40585900/d2d92f52-068d-4861-ae21-95a7a74fed89)
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/theodorusclarence/ts-nextjs-tailwind-starter)](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/stargazers)
-[![Depfu](https://badges.depfu.com/badges/fc6e730632ab9dacaf7df478a08684a7/overview.svg)](https://depfu.com/github/theodorusclarence/ts-nextjs-tailwind-starter?project_id=30160)
-[![Last Update](https://img.shields.io/badge/deps%20update-every%20sunday-blue.svg)](https://shields.io/)
+## Exciting Features ⚡
 
-</div>
+- 🚀 **Hassle-Free Onboarding**: 
 
-## Features
+  Join effortlessly with **Smart Accounts** that bridge Web2 and Web3. Get started without deep blockchain knowledge — a simple, barrier-free entry into the exciting world of decentralized        applications. 
 
-This repository is 🔋 battery packed with:
+- 🎨 **Dynamic NFT Avatar Generation**: 
 
-- ⚡️ Next.js 14 with App Router
-- ⚛️ React 18
-- ✨ TypeScript
-- 💨 Tailwind CSS 3 — Configured with CSS Variables to extend the **primary** color
-- 💎 Pre-built Components — Components that will **automatically adapt** with your brand color, [check here for the demo](https://tsnext-tw.thcl.dev/components)
-- 🃏 Jest — Configured for unit testing
-- 📈 Absolute Import and Path Alias — Import components using `@/` prefix
-- 📏 ESLint — Find and fix problems in your code, also will **auto sort** your imports
-- 💖 Prettier — Format your code consistently
-- 🐶 Husky & Lint Staged — Run scripts on your staged files before they are committed
-- 🤖 Conventional Commit Lint — Make sure you & your teammates follow conventional commit
-- ⏰ Release Please — Generate your changelog by activating the `release-please` workflow
-- 👷 Github Actions — Lint your code on PR
-- 🚘 Automatic Branch and Issue Autolink — Branch will be automatically created on issue **assign**, and auto linked on PR
-- 🔥 Snippets — A collection of useful snippets
-- 👀 Open Graph Helper Function — Awesome open graph generated using [og](https://github.com/theodorusclarence/og), fork it and deploy!
-- 🗺 Site Map — Automatically generate sitemap.xml
-- 📦 Expansion Pack — Easily install common libraries, additional components, and configs.
+    Create your unique digital identity with OpenAI's DALL-E, seamlessly integrated through **Chainlink Functions** to mint dynamic NFT avatars. Thanks to **Biconomy Paymaster**, these are     offered **free of charge** for new users, adding a personal touch from day one! 
 
-See the 👉 [feature details and changelog](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/blob/main/CHANGELOG.md) 👈 for more.
+- 🔄 **Autopay Creator Subscriptions**: 
 
-You can also check all of the **details and demos** on my blog post:
+    Never miss content from your favorite creators! Our **Chainlink Automation** setup wraps **Chainlink Functions** with nodemailer to keep you informed about your subscription status automatically. 
 
-- [One-stop Starter to Maximize Efficiency on Next.js & Tailwind CSS Projects](https://theodorusclarence.com/blog/one-stop-starter)
+- 🔗🌍 **Cross-Chain Subscriptions with Custom Pricefeeds**: 
 
-## Getting Started
+    Enjoy the freedom to follow and support creators across multiple blockchains, thanks to **Chainlink CCIP** & **Chainlink PriceFeeds**. No worries about single chain liquidity — subscribe anywhere, anytime! 
 
-### 1. Clone this template using one of the three ways
+- 💸 **Gasless and Bundled Transactions**: 
 
-1. Use this repository as template
+    Experience the smoothest UX yet with Smart Account gasless and bundled transactions. Approve NFTs, make payments, and manage subscriptions all in one go, without the usual gas fees. 
 
-   **Disclosure:** by using this repository as a template, there will be an attribution on your repository.
+-  🎲📞 **Monthly Lucky Subscriber Draw**: 
 
-   I'll appreciate if you do, so this template can be known by others too 😄
+    Join the excitement with our monthly draws using **Chainlink VRF**! Every month, a lucky subscriber wins a one-on-one live call with a creator. Will it be you this time?
+---
 
-   ![Use as template](https://user-images.githubusercontent.com/55318172/129183039-1a61e68d-dd90-4548-9489-7b3ccbb35810.png)
+## Avalanche Network
 
-2. Using `create-next-app`
+### Overview
+The Avalanche integration focuses on user onboarding and content interaction within a high-performance blockchain environment. It includes advanced features such as DALL-E integration for avatar creation and cross-chain subscription functionalities.
 
-   ```bash
-   pnpm create next-app  -e https://github.com/theodorusclarence/ts-nextjs-tailwind-starter ts-pnpm
-   ```
+### Features
 
-   If you still want to use **pages directory** (_is not actively maintained_) you can use this command
+- **User Onboarding**: Streamlined onboarding process including OpenAI's DALL-E for personalized avatar generation.
+- **Dynamic Avatar Generation**: Integrated directly into the onboarding process, leveraging OpenAI's DALL-E to provide users with unique, personalized avatars as they join.
+- **Purchase Subscription**: Utilizes Chainlink's price feeds and CCIP for cross-chain subscriptions, ensuring users can subscribe to content across various blockchains.
 
-   ```bash
-   npx create-next-app -e https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/tree/pages-directory project-name
-   ```
+### Contracts
 
-3. Using `degit`
+- **UserOnboarding Contract**: Generates user profile NFT with chainlink functions --> **openAI dalle** to generate random avatar art
+  - Address: [`0x82376dA85a76360BC9FfC9a542961429A2A653ff`](https://testnet.avascan.info/blockchain/all/address/0x82376dA85a76360BC9FfC9a542961429A2A653ff/contract) 
+- **Subscription Contract**: Manages subscriptions with functionalities enhanced by **Chainlink's price feed** and **CCIP**.
+  - Address: [Insert Address]
 
-   ```bash
-   npx degit theodorusclarence/ts-nextjs-tailwind-starter YOUR_APP_NAME
-   ```
 
-4. Deploy to Vercel
+---
 
-   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Ftheodorusclarence%2Fts-nextjs-tailwind-starter)
+## Sepolia Network
 
-### 2. Install dependencies
+### Overview
+Sepolia serves as the base layer for NFT minting and marketplace functionalities within BlockTease. It supports liquidity from all CCIP-enabled chains, allowing for a robust trading and subscription environment.
 
-It is encouraged to use **pnpm** so the husky hooks can work properly.
+### Features
 
-```bash
-pnpm install
-```
+- **NFT Minting and Marketplace**: Central hub for creating and trading NFTs.
+- **MockUSD**: Utilized for all transactional tests and purchases within the network.
+  - Address: [Insert Address]
+- **Marketplace Contract**: Facilitates the buying and selling of NFTs.
+  - Address: [Insert Address]
+- **BlockTease NFT Contract**: Repository for all model-related NFTs.
+  - Address: [Insert Address]
+- **Chainlink Price Feeder**: Integrates Chainlink price feeds for accurate native payment processing.
 
-### 3. Run the development server
+---
 
-You can start the server using this command:
+## Polygon Network
 
-```bash
-pnpm dev
-```
+### Overview
+On Polygon, the focus is on providing seamless subscription services through the use of Chainlink technologies, enhancing both the efficiency and reliability of transactions.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. You can start editing the page by modifying `src/pages/index.tsx`.
+### Features
 
-### 4. Change defaults
+- **Purchase Subscription**: Leverages Chainlink price feeders and CCIP for efficient cross-chain subscriptions.
 
-There are some things you need to change including title, urls, favicons, etc.
+### Contracts
 
-Find all comments with !STARTERCONF, then follow the guide.
+- **Purchase Subscription Contract**: Utilizes Chainlink technology for accurate and efficient subscription management.
+  - Address: [Insert Address]
 
-Don't forget to change the package name in package.json
+---
 
-### 5. Commit Message Convention
+## zkSync Network
 
-This starter is using [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/), it is mandatory to use it to commit changes.
+### Overview
+zkSync is leveraged for its Layer-2 scaling solutions, providing cost-effective transaction capabilities for subscription services.
 
-## Projects using ts-nextjs-tailwind-starter
+### Features
 
-<!--
-TEMPLATE
-- [sitename](https://sitelink.com) ([Source](https://github.com/githublink))
-- [sitename](https://sitelink.com)
--->
+- **Subscription Services**: Efficient and cost-effective subscription management on a Layer-2 platform.
 
-- [theodorusclarence.com](https://theodorusclarence.com) ([Source](https://github.com/theodorusclarence/theodorusclarence.com))
-- [Notiolink](https://notiolink.thcl.dev/) ([Source](https://github.com/theodorusclarence/notiolink))
-- [NextJs + Materia UI + Typescript](https://github.com/AlexStack/nextjs-materia-mui-typescript-hook-form-scaffold-boilerplate-starter)
+### Contracts
 
-Are you using this starter? Please add your page (and repo) to the end of the list via a [Pull Request](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/edit/main/README.md). 😃
+- **Subscription Contract**: Manages subscription processes efficiently on zkSync's Layer-2 network.
+  - Address: [Insert Address]
 
-## Expansion Pack 📦
+---
 
-This starter is now equipped with an [expansion pack](https://github.com/theodorusclarence/expansion-pack).
 
-You can easily add expansion such as React Hook Form + Components, Storybook, and more just using a single command line.
+## Moonbeam Network
 
-<https://user-images.githubusercontent.com/55318172/146631994-e1cac137-1664-4cfe-950b-a96decc1eaa6.mp4>
+### Overview
 
-Check out the [expansion pack repository](https://github.com/theodorusclarence/expansion-pack) for the commands
+This project demonstrates the interaction with smart contracts deployed on the Moonbase Alpha Testnet. Moonbase Alpha is the test network (testnet) for Moonbeam, providing a blockchain environment that supports Ethereum compatible smart contracts.
 
-### App Router Update
+### Features
 
-Due to App Router update, the expansion pack is currently **outdated**. It will be updated in the future. You can still use them by copy and pasting the files.
+- **Smart Contract Interaction**: The script provides functionalities to interact with pre-deployed contracts on the Moonbase Alpha Testnet, performing batch transactions to streamline processes such as token approvals and subscriptions.
+- **Batch Transactions**: Utilize a precompiled batch functionality to execute multiple contract calls in a single transaction, reducing gas costs and improving transaction efficiency.
+- **Gasless Transactions**: Features a gasless precompile to fund the gas fees of batch transactions, enabling users to execute operations without the direct cost of gas.
+
+### Contracts
+
+The project uses the following contracts deployed on the Moonbase Alpha Testnet:
+
+- **MockUSD Contract**: A mock USD stablecoin used for transactional testing within the network.
+  - Address: [`0x309222b7833D3D0A59A8eBf9C64A5790bf43E2aA`](https://moonbase.moonscan.io/address/0x309222b7833D3D0A59A8eBf9C64A5790bf43E2aA)
+- **PurchaseSubscription Contract**: Manages subscriptions payments via the MockUSD token.
+  - Address: [`0xF99b791257ab50be7F235BC825E7d4B83942cf38`](https://moonbase.moonscan.io/address/0xF99b791257ab50be7F235BC825E7d4B83942cf38)
+- **Batch Contract**: Facilitates batch processing of transactions.
+  - Address: [`0x0000000000000000000000000000000000000808`](https://moonbase.moonscan.io/address/0x0000000000000000000000000000000000000808)
+- **Gasless Precompile Contract**: After batching, utilizes a gasless precompile to cover the gas fees of the batch transactions.
+  - Address: [`0x000000000000000000000000000000000000080a`](https://moonbase.moonscan.io/address/0x000000000000000000000000000000000000080a)
+
+### Getting Started
+
+To interact with these contracts, you will need to set up your development environment:
+
+1. **Install Dependencies**: Make sure you have Node.js and npm installed. Then run `npm install` to install the required dependencies including Hardhat and Ethers.js.
+2. **Configure Hardhat**: Set up your Hardhat environment to connect to the Moonbase Alpha Testnet. Modify your `hardhat.config.js` to include network settings for Moonbase Alpha.
+3. **Run the Script**: Execute the script using Hardhat's command line tools. For example, `npx hardhat run scripts/GassLessbatchTxn.js --network moonbasealpha`.
