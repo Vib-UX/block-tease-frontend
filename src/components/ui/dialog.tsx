@@ -512,6 +512,7 @@ export default function MyModal({
                                   login(2);
                                 }
                                 setWalletChosen(coin.name);
+                                setLoadingState('Confirm Payment');
                               }}
                               className={`group/button relative  inline-flex  h-10 w-10 items-center justify-center overflow-hidden bg-transparent font-medium text-white transition-all duration-300 hover:w-24 ${
                                 walletChosen === coin.name ? 'bg-gray-800' : ''
