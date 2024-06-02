@@ -39,9 +39,9 @@ const Avatar = ({
     }
   }, [ipfsUrl]);
 
-  if (!teaseData) {
-    return <div>Loading...</div>;
-  }
+  // if (!teaseData) {
+  //   return <div>Loading...</div>;
+  // }
   return (
     <a
       href={`https://testnets.opensea.io/assets/avalanche-fuji/0x82376da85a76360bc9ffc9a542961429a2a653ff/${openId}`}
@@ -50,17 +50,15 @@ const Avatar = ({
       className=' flex flex-col gap-1 items-center justify-center cursor-pointer'
     >
       <div className='rounded-full'>
-        {avatarLoading && ipfsUrl !== "" && teaseData.image !== "" ? (
-          <RippleLoader />
-        ) : (
+        {teaseData && teaseData.image && teaseData.image !== "" ?
           <Image
             src={teaseData.image}
             alt={teaseData.name}
             width={50}
             height={50}
             className=' rounded-full'
-          />
-        )}
+          /> : <RippleLoader />
+        }
       </div>
       <p className='text-[#CEB9E9] text-sm font-semibold'>
         {teaseData.name}.tease
