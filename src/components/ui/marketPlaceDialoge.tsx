@@ -46,7 +46,7 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
   }, []);
   const handleListing = async () => {
     try {
-
+      debugger
       const _provider = await login(2)
       if (!_provider) {
         throw new Error("Provider not initialized")
@@ -61,7 +61,7 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
         },
         body: JSON.stringify({
           "tokenId": tokenId,
-          "listingPrice": listingPrice
+          "price": listingPrice
         })
       });
       const response = await req.json()
@@ -75,7 +75,8 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
         toast.error('Something went wrong', toastStyles);
       }
     } catch (error) {
-
+      debugger
+      toast.dismiss();
       console.error(error)
       toast.error('Something went wrong', toastStyles);
     }
@@ -154,7 +155,7 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
                         <Input
                           type='number'
                           placeholder='Amount'
-                          onClick={(e) => {
+                          onChange={(e) => {
                             setListingPrice(e.target.value)
                           }}
                           className={clsx(

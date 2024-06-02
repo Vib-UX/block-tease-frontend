@@ -471,13 +471,14 @@ export async function batchList(
       { name: 'deadline', type: 'uint256' },
     ],
   };
-  const userSigner = signer.getAddress();
+  const userSigner = await signer.getAddress();
   const listNft = new ethers.Contract(nft, nftAbi, signer);
   const nftMarketPlace = new ethers.Contract(
     nftMarketPlaceAddrMoon,
     NftsMarketPlaceMoonAbi,
     signer
   );
+  debugger
   const batch = new ethers.Contract(batchAddress, batchAbi, signer);
   const priceInMinUnits = ethers.utils.parseUnits(priceInUsd.toString(), 8);
   console.log(priceInMinUnits);
@@ -522,7 +523,7 @@ export async function batchList(
   console.log(`Signature hash: ${signature}`);
 
   const formattedSignature = ethers.utils.splitSignature(signature);
-
+  debugger
   // This gets dispatched using the dApps signer
   const dispatch = await callPermit.dispatch(
     message.from,
@@ -544,15 +545,12 @@ export async function batchList(
   return { fromAddr: dispatch.from, dispatch: dispatch.hash };
 }
 export async function BuyNft(provider: any, tokenId: any, price: any) {
-  console.log(tokenId);
-
   const signer = provider.getSigner();
   await checkBalances(signer);
   const thirdPartyGasSigner = new ethers.Wallet(
     process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
     provider
   );
-  console.log(thirdPartyGasSigner);
   const domain = {
     name: 'Call Permit Precompile',
     version: '1',

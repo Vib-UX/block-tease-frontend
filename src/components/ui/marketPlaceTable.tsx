@@ -57,14 +57,13 @@ export default function CustomizedTables() {
       if (!apiResponse.ok) {
         throw new Error(responseData.message || 'Failed to purchase NFT');
       }
-      console.log('Purchase response:', responseData);
     } catch (error) {
-      console.error('Error purchasing NFT:', error);
+      toast.dismiss()
       toast.error('Failed to purchase NFT', toastStyles);
     }
     if (resp.dispatch) {
+      toast.dismiss()
       toast.success('NFT successfully purchased', toastStyles);
-      localStorage.setItem(modelId, tokenId);
     }
   };
 
