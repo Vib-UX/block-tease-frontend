@@ -85,7 +85,13 @@ function useWeb3auth(chainIndex?: number) {
     clientId,
     web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
   });
-  const openloginAdapter = new OpenloginAdapter();
+  const openloginAdapter = new OpenloginAdapter({
+    adapterSettings: {
+      whiteLabel: {
+        mode: "dark"
+      }
+    }
+  });
   web3auth.configureAdapter(openloginAdapter);
   web3auth.configureAdapter(metamaskAdapter);
 
