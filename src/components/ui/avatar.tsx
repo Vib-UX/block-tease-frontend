@@ -50,7 +50,7 @@ const Avatar = ({
       className=' flex flex-col gap-1 items-center justify-center cursor-pointer'
     >
       <div className='rounded-full'>
-        {avatarLoading && teaseData.image !== "" ? (
+        {avatarLoading && ipfsUrl !== "" && teaseData.image !== "" ? (
           <RippleLoader />
         ) : (
           <Image
