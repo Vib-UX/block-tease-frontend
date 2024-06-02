@@ -79,10 +79,12 @@ export default function CustomizedTables({
     const fetchData = async () => {
       try {
         if (chain.toLowerCase() !== "moonbeam") {
-          setData([])
+          const response = await fetch('https://db-graph-backend.onrender.com/api/listed-subscriptions');
+          const jsonData = await response.json();
+          setData(jsonData.data.sort((a, b) => parseFloat(b.price) - parseFloat(a.price)));
           return
         }
-        await login(2)
+        // await login(2)
         const response = await fetch('https://db-graph-backend.onrender.com/api/listed-subscriptions-moonbeam');
         const jsonData = await response.json();
         setData(jsonData.data.sort((a, b) => parseFloat(b.price) - parseFloat(a.price)));

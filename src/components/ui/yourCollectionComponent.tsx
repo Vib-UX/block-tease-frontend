@@ -30,10 +30,20 @@ const YourCollection = ({
     // setIsUnlocked(res);
     try {
       if (chain.toLowerCase() !== "moonbeam") {
-        setData([])
+        const resp = await fetch(
+          `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
+          // `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
+          {
+            method: 'GET',
+          }
+        );
+        const data = await resp.json();
+        if (data.success) {
+          const result = filterMatchingIds(data.data.subscriptions, allModelData);
+          setData(result);
+        }
         return
       }
-      await login(2)
       const resp = await fetch(
         // `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
         `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
