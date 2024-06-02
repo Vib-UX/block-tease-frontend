@@ -108,7 +108,7 @@ function useWeb3auth(chainIndex?: number) {
         setSmartAccountAddress(saAddress);
         setLoggedIn(true);
       }
-
+      getUserInfo()
       setProvider(web3auth.provider);
     } catch (error) {
       console.error(error);
@@ -150,6 +150,7 @@ function useWeb3auth(chainIndex?: number) {
       setWalletAddress(address)
       setSmartAccountAddress(address);
     }
+    getUserInfo()
     setProvider(web3authProvider);
     if (web3auth.connected) {
       setLoggedIn(true);
@@ -164,6 +165,7 @@ function useWeb3auth(chainIndex?: number) {
 
     setName(user.name);
     setEmail(user.email);
+    return user
   };
   const getAccounts = async () => {
     if (!provider) {
@@ -197,6 +199,7 @@ function useWeb3auth(chainIndex?: number) {
     address,
     email,
     smartAccount,
+    getUserInfo
   };
 }
 export default useWeb3auth;

@@ -17,7 +17,7 @@ const CreatorProfile = ({ params }: Props) => {
   const [modelFees, setModelFees] = useState<number>(0);
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
   const modelData = allModelData.filter((item) => item.slug === params.id)[0];
-  const { address } = useWeb3auth();
+  const { address, email } = useWeb3auth();
 
   const fetchModalFees = async () => {
     const data = await getModalPayment(modelData.id);
@@ -29,7 +29,7 @@ const CreatorProfile = ({ params }: Props) => {
     // setIsUnlocked(res);
     try {
       const resp = await fetch(
-        `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}`,
+        `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
         {
           method: 'GET',
         }

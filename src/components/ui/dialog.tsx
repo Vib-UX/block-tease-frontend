@@ -119,6 +119,34 @@ export default function MyModal({
     setProgress(33);
     toast.success('Payment completed successfully', toastStyles);
   };
+  const chainLinkNotifierMoonbeam = async () => {
+    try {
+      const resp = await fetch(
+        'https://db-graph-backend.onrender.com/api/purchase-subscription-moonbeam',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            modelId: modelId,
+            tokenId: (
+              BigInt(1e18) * BigInt(modelId) +
+              BigInt(subscriptionId)
+            ).toString(),
+          }),
+        }
+      );
+      const data = await resp.json();
+      if (data.success) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      toast.error('Something went wrong', toastStyles);
+    }
+  };
   const chainLinkNotifier = async () => {
     try {
       const resp = await fetch(
@@ -176,7 +204,7 @@ export default function MyModal({
         setBatchGaslessTrx(resp.dispatch);
         showMsgs();
         if (resp.dispatch) {
-          const res = await chainLinkNotifier();
+          const res = await chainLinkNotifierMoonbeam();
           // mintNft(resp.fromAddr);
           setProgress(100);
           toast.success('Transaction successfull 🚀', toastStyles);
@@ -250,9 +278,6 @@ export default function MyModal({
   React.useEffect(() => {
     insufficiantBalance();
   }, [walletChosen]);
-
-  console.log(batchGaslessTrx, "btcs");
-
 
   return (
     <>

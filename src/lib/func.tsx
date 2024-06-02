@@ -29,10 +29,9 @@ const mockUsdAddress = '0xf7409b94F7285d27Ab1A456638A1110A4E55bFEC';
 const userOnboardingAddress = '0x82376dA85a76360BC9FfC9a542961429A2A653ff';
 const batchAddress = '0x0000000000000000000000000000000000000808';
 const precompileAddress = '0x000000000000000000000000000000000000080a';
-const nftMarketPlaceAddrMoon = '0x8208834c529664385fd2CA735EFB64a41d79823b';
+const nftMarketPlaceAddrMoon = '0xc96b21eDA35A43eFfc57d459688e066315106f59';
 const nftMarketPlaceAddrSepolia = '0xc36B6BFa0ce8C6bdD8efcCd23CeC2E425768f64a';
 const nft = '0x12B77FEb2c44dC16d57d96a1FedEd3136Ad02FBB';
-
 
 
 type minitingNftProps = {
@@ -445,7 +444,8 @@ export async function batchList(
   tokenId: string | null,
   priceInUsd: number
 ) {
-  await checkBalances(provider);
+  const signer = provider.getSigner()
+  await checkBalances(signer);
   const thirdPartyGasSigner = new ethers.Wallet(
     process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
     provider
@@ -468,8 +468,6 @@ export async function batchList(
       { name: 'deadline', type: 'uint256' },
     ],
   };
-  const signer = provider.getSigner();
-
   const userSigner = signer.getAddress();
   const listNft = new ethers.Contract(nft, nftAbi, signer);
   const nftMarketPlace = new ethers.Contract(
@@ -539,12 +537,14 @@ export async function batchList(
   console.log(dispatch);
   console.log(`Gasless Batch Precompile Transaction hash: ${dispatch.hash}`);
 
-  await checkBalances(provider);
+  await checkBalances(signer);
   return { fromAddr: dispatch.from, dispatch: dispatch.hash };
 }
-export async function BuyNft(provider: any, tokenId: any) {
+export async function BuyNft(provider: any, tokenId: any, price: any) {
   console.log(tokenId);
-  await checkBalances(provider);
+  debugger
+  const signer = provider.getSigner()
+  await checkBalances(signer);
   const thirdPartyGasSigner = new ethers.Wallet(
     process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
     provider
@@ -567,9 +567,8 @@ export async function BuyNft(provider: any, tokenId: any) {
       { name: 'deadline', type: 'uint256' },
     ],
   };
-  const signer = provider.getSigner();
 
-  const userSigner = signer.getAddress();
+  const userSigner = await signer.getAddress();
   const mockUsd = new ethers.Contract(mockUsdAddress, mockUsdAbi, signer);
   //1 -> replace purchase subs with nft marketplace
   const nftMarketPlace = new ethers.Contract(
@@ -577,18 +576,15 @@ export async function BuyNft(provider: any, tokenId: any) {
     NftsMarketPlaceMoonAbi,
     signer
   );
-  const batch = new ethers.Contract(batchAddress, batchAbi, signer);
-  const listingPrice = new ethers.Contract(
-    nftMarketPlaceAddrMoon,
-    NftsMarketPlaceMoonAbi,
-    thirdPartyGasSigner
+  const scaledDownPrice = ethers.utils.parseUnits(
+    price,
+    8
   );
-  const resp = await listingPrice.listings('4000000496299419492');
-  const price = await resp.price;
-  console.log(price);
+
+  const batch = new ethers.Contract(batchAddress, batchAbi, signer);
   const approvalCallData = mockUsd.interface.encodeFunctionData('approve', [
     nftMarketPlaceAddrMoon,
-    price,
+    scaledDownPrice,
   ]);
   const buyNFT = nftMarketPlace.interface.encodeFunctionData(
     'buyNFTWithUSDC', //puracseSubscrition call this
@@ -641,8 +637,7 @@ export async function BuyNft(provider: any, tokenId: any) {
 
   await dispatch.wait();
   console.log(`Gasless Batch Precompile Transaction hash: ${dispatch.hash}`);
-
-  await checkBalances(provider);
+  await checkBalances(signer);
   return { fromAddr: dispatch.from, dispatch: dispatch.hash };
 }
 // export async function userOnBoarding(provider: any, name: string | undefined) {
