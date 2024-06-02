@@ -6,7 +6,10 @@ import { chainConfig } from '@/hooks/useWeb3auth';
 
 import batchAbi from '../constant/Batch.json';
 import nftAutomationAbi from '../constant/MarketplaceAutomation.json';
-import { default as mockUsdAbi, default as UsdcEthSepoliaAbi } from '../constant/MockUSD.json';
+import {
+  default as mockUsdAbi,
+  default as UsdcEthSepoliaAbi,
+} from '../constant/MockUSD.json';
 import nftAbi from '../constant/nft.json';
 import nftMarketPlaceSepoliaAbi from '../constant/NftMarketPlaceSepolia.json';
 import NftsMarketPlaceMoonAbi from '../constant/nftsMarketPlaceAbi.json';
@@ -29,10 +32,10 @@ const mockUsdAddress = '0xf7409b94F7285d27Ab1A456638A1110A4E55bFEC';
 const userOnboardingAddress = '0x82376dA85a76360BC9FfC9a542961429A2A653ff';
 const batchAddress = '0x0000000000000000000000000000000000000808';
 const precompileAddress = '0x000000000000000000000000000000000000080a';
-const nftMarketPlaceAddrMoon = '0xc96b21eDA35A43eFfc57d459688e066315106f59';
+// const nftMarketPlaceAddrMoon = '0xc96b21eDA35A43eFfc57d459688e066315106f59';
+const nftMarketPlaceAddrMoon = '0xA524319d310fa96AAf6E25F8af729587C2DEaE8a';
 const nftMarketPlaceAddrSepolia = '0xc36B6BFa0ce8C6bdD8efcCd23CeC2E425768f64a';
 const nft = '0x12B77FEb2c44dC16d57d96a1FedEd3136Ad02FBB';
-
 
 type minitingNftProps = {
   modelId: number;
@@ -44,7 +47,7 @@ type batchSubscribeProps = {
   modelId: number;
   subscriptionId: number;
   priceInUsd: number;
-  provider: ethers.providers.JsonRpcProvider
+  provider: ethers.providers.JsonRpcProvider;
 };
 type approveNSubscribeProps = {
   priceInUsd: number;
@@ -222,9 +225,9 @@ export async function batchSubscribeFor({
   modelId,
   subscriptionId,
   priceInUsd,
-  provider
+  provider,
 }: batchSubscribeProps) {
-  const signer = provider.getSigner()
+  const signer = provider.getSigner();
   await checkBalances(signer);
   const thirdPartyGasSigner = new ethers.Wallet(
     process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
@@ -444,7 +447,7 @@ export async function batchList(
   tokenId: string | null,
   priceInUsd: number
 ) {
-  const signer = provider.getSigner()
+  const signer = provider.getSigner();
   await checkBalances(signer);
   const thirdPartyGasSigner = new ethers.Wallet(
     process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
@@ -543,7 +546,7 @@ export async function batchList(
 export async function BuyNft(provider: any, tokenId: any, price: any) {
   console.log(tokenId);
 
-  const signer = provider.getSigner()
+  const signer = provider.getSigner();
   await checkBalances(signer);
   const thirdPartyGasSigner = new ethers.Wallet(
     process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
@@ -576,10 +579,7 @@ export async function BuyNft(provider: any, tokenId: any, price: any) {
     NftsMarketPlaceMoonAbi,
     signer
   );
-  const scaledDownPrice = ethers.utils.parseUnits(
-    price,
-    8
-  );
+  const scaledDownPrice = ethers.utils.parseUnits(price, 8);
 
   const batch = new ethers.Contract(batchAddress, batchAbi, signer);
   const approvalCallData = mockUsd.interface.encodeFunctionData('approve', [
