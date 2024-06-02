@@ -542,7 +542,7 @@ export async function batchList(
 }
 export async function BuyNft(provider: any, tokenId: any, price: any) {
   console.log(tokenId);
-  debugger
+
   const signer = provider.getSigner()
   await checkBalances(signer);
   const thirdPartyGasSigner = new ethers.Wallet(

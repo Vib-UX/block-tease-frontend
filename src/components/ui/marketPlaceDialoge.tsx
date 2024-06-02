@@ -46,7 +46,7 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
   }, []);
   const handleListing = async () => {
     try {
-      debugger
+
       const _provider = await login(2)
       if (!_provider) {
         throw new Error("Provider not initialized")
@@ -65,7 +65,7 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
         })
       });
       const response = await req.json()
-      debugger
+
       if (resp.dispatch) {
         toast.dismiss();
         toast.success('NFT listed successfully 🚀', toastStyles);
@@ -75,7 +75,7 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
         toast.error('Something went wrong', toastStyles);
       }
     } catch (error) {
-      debugger
+
       console.error(error)
       toast.error('Something went wrong', toastStyles);
     }
