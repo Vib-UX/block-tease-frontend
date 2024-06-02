@@ -17,8 +17,14 @@ import nftAutomationAbi from '../constant/MarketplaceAutomation.json';
 import UsdcAvaAbi from '../constant/usdcAva.json';
 import UsdcEthSepoliaAbi from '../constant/MockUSD.json';
 import blockTeaseNftAbi from '../constant/blockTeaseNft.json';
+import blockTeaseNftZkevmAbi from '../constant/Zkevm/blockTeaseNftZkevm.json';
+import markeplaceZkevmAbi from '../constant/Zkevm/marketplaceZkevm.json';
+import mUsdZkevmAbi from '../constant/Zkevm/mUsdZkevm.json';
 import { BiconomySmartAccountV2, PaymasterMode } from '@biconomy/account';
 import { chainConfig } from '@/hooks/useWeb3auth';
+const mUsdZkevmAddr = '0x3FA6cfdC28Ad346c4360AA0543b5BfdA551c7111';
+const blockTeaseNftZkevmAddr = '0x5192Ffbc96b2E731649714B7b51d4cC4CA1fAB8F';
+const marketplaceZkevmAddr = '0x054ba199Ef61ef15226e2CeB61138f7d5E2F8408';
 const nftAutomationAddr = '0x87555010E191072421d4f4B14E75FB59abE778B0';
 const usdcSepoliaEthAddr = '0x9d24c52916A14afc31D86B5Aa046b252383ee444';
 const purchaseSubscriptionAddress =
@@ -1063,7 +1069,11 @@ export async function chainLinkAutomationSubscription(
   }
 }
 
-async function listNft(smartAccount: any, tokenId: any, priceInUsd: any) {
+export async function listNft(
+  smartAccount: any,
+  tokenId: any,
+  priceInUsd: any
+) {
   console.log('Starting listNft');
   const provider = new ethers.providers.JsonRpcProvider(
     'https://eth-sepolia.public.blastapi.io'
@@ -1091,10 +1101,10 @@ async function listNft(smartAccount: any, tokenId: any, priceInUsd: any) {
   console.log('Approval transaction for NFT transfer created');
 
   // Step 2: Create the listing transaction
-  const priceInWei = ethers.utils.parseUnits(priceInUsd.toString(), 'ether');
+  const priceInUsdc = ethers.utils.parseUnits(priceInUsd.toString(), 8);
   const listTx = await marketplaceContractInstance.populateTransaction.listNft(
     tokenId,
-    priceInWei
+    priceInUsdc
   );
   const listTransaction = { to: nftAutomationAddr, data: listTx.data };
   console.log('NFT listing transaction created');
@@ -1161,5 +1171,172 @@ export async function buyNft(
 
   const { transactionHash } = await bundleTransaction.waitForTxHash();
   console.log('Transaction Hash:', transactionHash);
+  return { hash: transactionHash };
+}
+
+export async function listNftZkevm(
+  smartAccount: any,
+  tokenId: any,
+  priceInUsd: any
+) {
+  console.log('Starting listNft');
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://polygonzkevm-cardona.g.alchemy.com/v2/74AYnHBhDO7HQL6gzlAu_-G_-xaMTfXf'
+  );
+  const nftContractInstance = new ethers.Contract(
+    blockTeaseNftZkevmAddr,
+    blockTeaseNftZkevmAbi,
+    provider
+  );
+  const marketplaceContractInstance = new ethers.Contract(
+    marketplaceZkevmAddr,
+    markeplaceZkevmAbi,
+    provider
+  );
+  const owner = await smartAccount.getAccountAddress();
+  // Check if approval is needed and prepare approval transaction
+  const isApproved = await nftContractInstance.isApprovedForAll(
+    owner,
+    marketplaceZkevmAddr
+  );
+  const transactions = [];
+
+  if (!isApproved) {
+    const approvalTx =
+      await nftContractInstance.populateTransaction.setApprovalForAll(
+        marketplaceZkevmAddr,
+        true
+      );
+    transactions.push({ to: blockTeaseNftZkevmAddr, data: approvalTx.data });
+  }
+
+  // Prepare listing transaction
+  const priceInUsdc = ethers.utils.parseUnits(priceInUsd.toString(), 8);
+  const listTx = await marketplaceContractInstance.populateTransaction.listNFT(
+    tokenId,
+    priceInUsdc
+  );
+  transactions.push({ to: marketplaceZkevmAddr, data: listTx.data });
+
+  // Bundle and send transactions
+  console.log('Sending bundled transactions through SmartAccount...');
+  const bundleTransaction = await smartAccount.sendTransaction(transactions, {
+    paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+  });
+
+  const { transactionHash } = await bundleTransaction.waitForTxHash();
+  console.log('Listing Transaction Hash:', transactionHash);
+  return { hash: transactionHash };
+}
+
+export async function buyNftWithUsdcZkevm(
+  smartAccount: any,
+  tokenId: any,
+  priceInUsd: any
+) {
+  console.log('Starting buyNftWithUsdc');
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://polygonzkevm-cardona.g.alchemy.com/v2/74AYnHBhDO7HQL6gzlAu_-G_-xaMTfXf'
+  );
+  const usdcContractInstance = new ethers.Contract(
+    mUsdZkevmAddr,
+    mUsdZkevmAbi,
+    provider
+  );
+  const nftMarketplaceInstance = new ethers.Contract(
+    marketplaceZkevmAddr,
+    markeplaceZkevmAbi,
+    provider
+  );
+  const owner = await smartAccount.getAccountAddress();
+  const priceInUsdc = ethers.utils.parseUnits(priceInUsd.toString(), 8);
+  const transactions = [];
+
+  // Check allowance and prepare approval transaction if necessary
+  const currentAllowance = await usdcContractInstance.allowance(
+    owner,
+    marketplaceZkevmAddr
+  );
+  if (currentAllowance.lt(priceInUsdc)) {
+    const approvalTx = await usdcContractInstance.populateTransaction.approve(
+      marketplaceZkevmAddr,
+      priceInUsdc
+    );
+    transactions.push({ to: mUsdZkevmAddr, data: approvalTx.data });
+  }
+
+  // Prepare buy transaction
+  const buyTx = await nftMarketplaceInstance.populateTransaction.buyNFTWithUSDC(
+    tokenId
+  );
+  transactions.push({ to: marketplaceZkevmAddr, data: buyTx.data });
+
+  // Bundle and send transactions
+  console.log('Sending bundled transactions through SmartAccount...');
+  const bundleTransaction = await smartAccount.sendTransaction(transactions, {
+    paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+  });
+
+  const { transactionHash } = await bundleTransaction.waitForTxHash();
+  console.log('Buy Transaction Hash:', transactionHash);
+  return { hash: transactionHash };
+}
+
+export async function purchaseSubscriptionZkevm(
+  smartAccount: any,
+  modelId: any,
+  subscriptionId: any,
+  priceInUsd: any,
+  duration: any
+) {
+  console.log('Starting purchaseSubscription');
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://polygonzkevm-cardona.g.alchemy.com/v2/74AYnHBhDO7HQL6gzlAu_-G_-xaMTfXf'
+  );
+  const subscriptionContract = new ethers.Contract(
+    marketplaceZkevmAddr,
+    markeplaceZkevmAbi,
+    provider
+  );
+  const paymentTokenInstance = new ethers.Contract(
+    mUsdZkevmAddr,
+    mUsdZkevmAbi,
+    provider
+  );
+  const owner = await smartAccount.getAccountAddress();
+  const model = await subscriptionContract.models(modelId);
+  const priceInUsdc = model.priceUSD; // price is in Wei
+  const transactions = [];
+
+  // Check allowance and prepare approval transaction if necessary
+  const currentAllowance = await paymentTokenInstance.allowance(
+    owner,
+    marketplaceZkevmAddr
+  );
+  if (currentAllowance.lt(priceInUsdc)) {
+    const approvalTx = await paymentTokenInstance.populateTransaction.approve(
+      marketplaceZkevmAddr,
+      priceInUsdc
+    );
+    transactions.push({ to: mUsdZkevmAddr, data: approvalTx.data });
+  }
+
+  // Prepare subscription purchase transaction
+  const purchaseTx =
+    await subscriptionContract.populateTransaction.purchaseSubscription(
+      modelId,
+      subscriptionId,
+      duration
+    );
+  transactions.push({ to: marketplaceZkevmAddr, data: purchaseTx.data });
+
+  // Bundle and send transactions
+  console.log('Sending bundled transactions through SmartAccount...');
+  const bundleTransaction = await smartAccount.sendTransaction(transactions, {
+    paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+  });
+
+  const { transactionHash } = await bundleTransaction.waitForTxHash();
+  console.log('Subscription Purchase Transaction Hash:', transactionHash);
   return { hash: transactionHash };
 }
