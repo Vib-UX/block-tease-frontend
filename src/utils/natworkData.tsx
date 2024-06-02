@@ -38,4 +38,8 @@ export const coinData = [
     name: 'Morph',
     icon: morphIcon,
   },
+  {
+    name: 'Polygon_Zkevm',
+    icon: polygonIcon,
+  },
 ];
