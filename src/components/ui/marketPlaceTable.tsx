@@ -31,18 +31,23 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const StyledTableRow = styled(TableRow)(({ theme }) => ({}));
 
 
-export default function CustomizedTables() {
+export default function CustomizedTables({
+  chain
+}: {
+  chain: string
+}) {
+  console.log(chain, "chan");
+
   const [provider, setProvider] = React.useState<any>(undefined);
 
   const { email, login } = useWeb3auth(2)
-
-
 
   const handleBuyNft = async (modelId: any, tokenId: any, price: any) => {
     toast.loading('Buying NFT', toastStyles);
     const _provider = await login(2)
     const resp = await BuyNft(_provider, tokenId, price);
     try {
+      if (chain.toLowerCase() !== "moonbeam") return
       const apiResponse = await fetch('https://db-graph-backend.onrender.com/api/update-subscription-moonbeam', {
         method: 'PATCH',
         headers: {
@@ -73,6 +78,11 @@ export default function CustomizedTables() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
+        if (chain.toLowerCase() !== "moonbeam") {
+          setData([])
+          return
+        }
+        await login(2)
         const response = await fetch('https://db-graph-backend.onrender.com/api/listed-subscriptions-moonbeam');
         const jsonData = await response.json();
         setData(jsonData.data.sort((a, b) => parseFloat(b.price) - parseFloat(a.price)));
@@ -82,7 +92,7 @@ export default function CustomizedTables() {
     };
 
     fetchData();
-  }, []);
+  }, [chain]);
 
   console.log(data, "dataa");
 

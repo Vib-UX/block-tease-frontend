@@ -14,6 +14,10 @@ import { coinData } from '@/utils/natworkData';
 function Page() {
   const [collection, setCollection] = useState('Your Collection');
   const { login } = useWeb3auth(2)
+  const [chain, setChain] = useState('')
+
+
+
   return (
     <div className=' border-l border  flex gap-10 flex-col w-full items-start py-6 overflow-x-hidden'>
       <SwiperCoverflow />
@@ -27,6 +31,7 @@ function Page() {
                 if (coin.name.toLowerCase() === "moonbeam") {
                   await login(2)
                 }
+                setChain(coin.name)
               }}
             >
               <div className='absolute left-0 w-7 h-7 p-0.5  rounded-full'>
@@ -44,8 +49,8 @@ function Page() {
           <span
             onClick={() => setCollection('Your Collection')}
             className={`${collection === 'Your Collection'
-                ? 'text-fuchsia-500'
-                : 'text-white'
+              ? 'text-fuchsia-500'
+              : 'text-white'
               } cursor-pointer font-bold text-xl`}
           >
             Your Collection
@@ -58,7 +63,7 @@ function Page() {
             Buy Collection
           </span>
         </div>
-        {collection === 'Buy Nft' ? <CustomizedTables /> : <YourCollection />}
+        {collection === 'Buy Nft' ? <CustomizedTables chain={chain} /> : <YourCollection chain={chain} />}
       </div>
     </div>
   );

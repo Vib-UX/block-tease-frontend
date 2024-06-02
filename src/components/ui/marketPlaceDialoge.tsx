@@ -75,6 +75,7 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
       }
     } catch (error) {
       toast.dismiss();
+      debugger
       console.error(error)
       toast.error('Something went wrong', toastStyles);
     }

@@ -90,8 +90,6 @@ function useWeb3auth(chainIndex?: number) {
   web3auth.configureAdapter(metamaskAdapter);
 
 
-  console.log(chainIndex, "chainindex");
-
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [address, setAddress] = useState<string | null>('');

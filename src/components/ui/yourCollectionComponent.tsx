@@ -9,8 +9,12 @@ import { toastStyles } from '@/lib/utils';
 import MarketPlaceCard from '@/components/ui/marketPlaceCard';
 
 import { allModelData } from '@/utils/modelData';
-const YourCollection = () => {
-  const { email } = useWeb3auth()
+const YourCollection = ({
+  chain
+}: {
+  chain: string
+}) => {
+  const { email, login } = useWeb3auth()
   const [tokenId, setTokenId] = useState('')
   const [data, setData] = useState([]);
   const filterMatchingIds = (array1: any, array2: any) => {
@@ -21,10 +25,15 @@ const YourCollection = () => {
     }).filter((s) => !s.isListed);
     return filteredArray;
   };
-  const fetchStatus = async (address: string, email: string) => {
+  const fetchStatus = async (address: string, email: string, chain: string) => {
     // const res = await balanceOffModel(provider, modelData.id.toString());
     // setIsUnlocked(res);
     try {
+      if (chain.toLowerCase() !== "moonbeam") {
+        setData([])
+        return
+      }
+      await login(2)
       const resp = await fetch(
         // `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
         `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
@@ -37,7 +46,7 @@ const YourCollection = () => {
         const result = filterMatchingIds(data.data.subscriptions, allModelData);
         setData(result);
       }
-      setTokenId(data.ata.subscriptions[0].tokenId)
+      setTokenId(data.data.subscriptions[0].tokenId)
     } catch (err) {
       toast.dismiss();
       toast.error('Something went wrong', toastStyles);
@@ -45,10 +54,10 @@ const YourCollection = () => {
   };
   const { walletAddress } = useGlobalStore();
   React.useEffect(() => {
-    if (walletAddress && email) {
-      fetchStatus(walletAddress, email);
+    if (walletAddress && email && chain) {
+      fetchStatus(walletAddress, email, chain);
     }
-  }, [email, walletAddress]);
+  }, [email, walletAddress, chain]);
 
 
   return (
