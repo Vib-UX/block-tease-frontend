@@ -24,12 +24,12 @@ const CreatorProfile = ({ params }: Props) => {
 
     setModelFees(parseInt(data));
   };
-  const fetchStatus = async (address: string) => {
+  const fetchStatus = async (address: string, email: string) => {
     // const res = await balanceOffModel(provider, modelData.id.toString());
     // setIsUnlocked(res);
     try {
       const resp = await fetch(
-        `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
+        `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
         {
           method: 'GET',
         }
@@ -51,11 +51,11 @@ const CreatorProfile = ({ params }: Props) => {
   };
   const { walletAddress } = useGlobalStore();
   React.useEffect(() => {
-    if (walletAddress) {
-      fetchStatus(walletAddress);
+    if (walletAddress && email) {
+      fetchStatus(walletAddress, email);
     }
     fetchModalFees();
-  }, []);
+  }, [email, walletAddress]);
 
   if (!modelData) return <NotFound />;
   return (
