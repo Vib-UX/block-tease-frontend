@@ -478,7 +478,6 @@ export async function batchList(
     NftsMarketPlaceMoonAbi,
     signer
   );
-  debugger
   const batch = new ethers.Contract(batchAddress, batchAbi, signer);
   const priceInMinUnits = ethers.utils.parseUnits(priceInUsd.toString(), 8);
   console.log(priceInMinUnits);
@@ -523,7 +522,7 @@ export async function batchList(
   console.log(`Signature hash: ${signature}`);
 
   const formattedSignature = ethers.utils.splitSignature(signature);
-  debugger
+
   // This gets dispatched using the dApps signer
   const dispatch = await callPermit.dispatch(
     message.from,
