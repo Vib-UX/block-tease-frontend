@@ -7,7 +7,10 @@ import { chainConfig } from '@/hooks/useWeb3auth';
 import batchAbi from '../constant/Batch.json';
 import blockTeaseNftAbi from '../constant/blockTeaseNft.json';
 import nftAutomationAbi from '../constant/MarketplaceAutomation.json';
-import { default as mockUsdAbi, default as UsdcEthSepoliaAbi } from '../constant/MockUSD.json';
+import {
+  default as mockUsdAbi,
+  default as UsdcEthSepoliaAbi,
+} from '../constant/MockUSD.json';
 import nftAbi from '../constant/nft.json';
 import nftMarketPlaceSepoliaAbi from '../constant/NftMarketPlaceSepolia.json';
 import NftsMarketPlaceMoonAbi from '../constant/nftsMarketPlaceAbi.json';
@@ -464,7 +467,6 @@ export async function getTestFunds(provider: any) {
   return { trxhash: trx.hash };
 }
 export async function getTestFundsZkEvm(smartAccount: any) {
-  debugger
   const provider = new ethers.providers.JsonRpcProvider(
     'https://rpc.cardona.zkevm-rpc.com'
   );
@@ -1349,7 +1351,6 @@ export async function purchaseSubscriptionZkevm(
   const approvalAmount = priceInUsd; // 3 times the duration
   const approvalUsdc = ethers.utils.parseUnits(approvalAmount.toString(), 8);
   console.log(`Price in USDC: ${approvalUsdc}`);
-
 
   const approvalTx = await paymentTokenInstance.populateTransaction.approve(
     marketplaceZkevmAddr,
