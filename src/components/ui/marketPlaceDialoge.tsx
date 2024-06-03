@@ -27,7 +27,8 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
 
   const [listingPrice, setListingPrice] = React.useState<number>(0);
 
-  const { smartAccount } = useWeb3auth();
+  const { smartAccount, login } = useWeb3auth();
+
   function open() {
     setIsOpen(true);
   }
@@ -37,6 +38,7 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
 
   const handleListing = async () => {
     toast.loading('Listing your NFT', toastStyles);
+    login(1);
     const resp = await listNft(smartAccount, tokenId, listingPrice);
     if (resp.hash) {
       const result = await fetch(

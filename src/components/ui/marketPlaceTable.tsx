@@ -76,7 +76,7 @@ const rows = IndianModelCardData.map((model) => {
 
 export default function CustomizedTables() {
   const [data, setData] = React.useState([]);
-  const { smartAccount } = useWeb3auth();
+  const { smartAccount, login } = useWeb3auth();
   const { smartAddress } = useGlobalStore();
   React.useEffect(() => {
     const fetchData = async () => {
@@ -98,7 +98,13 @@ export default function CustomizedTables() {
 
     fetchData();
   }, []);
-  const handleBuyNft = async (listingId: string, price: string) => {
+  const handleBuyNft = async (
+    tokenId: string,
+    listingId: string,
+    price: string
+  ) => {
+    login(1);
+
     toast.loading('Buying NFT', toastStyles);
     const resp = await buyNft(smartAccount, listingId, price);
     if (resp.hash) {
@@ -110,7 +116,7 @@ export default function CustomizedTables() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            tokenId: listingId,
+            tokenId: tokenId,
             wallet_address: smartAddress,
           }),
         }
@@ -167,7 +173,9 @@ export default function CustomizedTables() {
                   <div className='flex items-center  gap-2 '>
                     {modelData.name}
                     <svg
-                      onClick={() => handleBuyNft(row.listingId, row.price)}
+                      onClick={() =>
+                        handleBuyNft(row.tokenId, row.listingId, row.price)
+                      }
                       xmlns='http://www.w3.org/2000/svg'
                       fill='none'
                       viewBox='0 0 24 24'

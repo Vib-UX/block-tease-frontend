@@ -1105,13 +1105,15 @@ export async function chainLinkAutomationSubscription(
 
 export async function listNft(
   smartAccount: any,
-  tokenId: any,
-  priceInUsd: any
+  tokenIdString: string,
+  priceInUsdString: any
 ) {
   console.log('Starting listNft');
+  // Initialize provider
   const provider = new ethers.providers.JsonRpcProvider(
     'https://eth-sepolia.public.blastapi.io'
   );
+  // Initialize NFT and Marketplace contract instances
   const nftContractInstance = new ethers.Contract(
     blockTeaseNftAddr,
     blockTeaseNftAbi,
@@ -1123,41 +1125,55 @@ export async function listNft(
     provider
   );
 
-  console.log(`Listing NFT with ID: ${tokenId} at price: ${priceInUsd} USD`);
+  // Convert string inputs to appropriate data types
+  const cnvtTokenId = ethers.BigNumber.from(tokenIdString);
+  const priceInUsdc = ethers.utils.parseUnits(priceInUsdString.toString(), 8); // Assuming USDc has 8 decimal places
 
-  // Step 1: Approve the marketplace contract to manage the NFT
-  const approvalTx =
-    await nftContractInstance.populateTransaction.setApprovalForAll(
-      nftAutomationAddr,
-      true
-    );
-  const approvalTransaction = { to: blockTeaseNftAddr, data: approvalTx.data };
-  console.log('Approval transaction for NFT transfer created');
-
-  // Step 2: Create the listing transaction
-  const priceInUsdc = ethers.utils.parseUnits(priceInUsd.toString(), 8);
-  const listTx = await marketplaceContractInstance.populateTransaction.listNft(
-    tokenId,
-    priceInUsdc
+  console.log(
+    `Listing NFT with ID: ${cnvtTokenId.toString()} at price: ${priceInUsdString} USD`
   );
-  const listTransaction = { to: nftAutomationAddr, data: listTx.data };
-  console.log('NFT listing transaction created');
 
-  // Bundle transactions
-  const transactions = [approvalTransaction, listTransaction];
-  console.log('Transactions bundled', transactions);
+  try {
+    // Step 1: Approve the marketplace contract to manage the NFT
+    const approvalTx =
+      await nftContractInstance.populateTransaction.setApprovalForAll(
+        nftAutomationAddr,
+        true
+      );
+    const approvalTransaction = {
+      to: blockTeaseNftAddr,
+      data: approvalTx.data,
+    };
+    console.log('Approval transaction for NFT transfer created');
 
-  // Send Transactions
-  console.log('Sending bundled transactions through SmartAccount...');
-  const bundleTransaction = await smartAccount.sendTransaction(transactions, {
-    paymasterServiceData: { mode: PaymasterMode.SPONSORED },
-  });
-  console.log('Bundle transaction sent');
-  const listingId = await nftContractInstance.listingId();
-  const { transactionHash } = await bundleTransaction.waitForTxHash();
-  console.log('Listing Transaction Hash:', transactionHash);
+    // Step 2: Create the listing transaction
+    const listTx =
+      await marketplaceContractInstance.populateTransaction.listNft(
+        cnvtTokenId,
+        priceInUsdc
+      );
+    const listTransaction = { to: nftAutomationAddr, data: listTx.data };
+    console.log('NFT listing transaction created');
 
-  return { hash: transactionHash, listingId: listingId - 1 };
+    // Bundle transactions
+    const transactions = [approvalTransaction, listTransaction];
+    console.log('Transactions bundled', transactions);
+
+    // Send Transactions
+    console.log('Sending bundled transactions through SmartAccount...');
+    const bundleTransaction = await smartAccount.sendTransaction(transactions, {
+      paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+    });
+    console.log('Bundle transaction sent');
+    const listingId = await marketplaceContractInstance.listingId();
+    const { transactionHash } = await bundleTransaction.waitForTxHash();
+    console.log('Listing Transaction Hash:', transactionHash);
+
+    return { hash: transactionHash, listingId: listingId.toString() };
+  } catch (error) {
+    console.error('Error in listing NFT:', error);
+    throw error;
+  }
 }
 
 export async function buyNft(
@@ -1180,7 +1196,7 @@ export async function buyNft(
     provider
   );
 
-  const approvalUsdc = ethers.utils.parseUnits(priceInUsd.toString(), 8);
+  const approvalUsdc = ethers.utils.parseUnits(priceInUsd, 8);
   console.log(`Approving USDC: ${approvalUsdc}`);
 
   // Approve USDC spending
