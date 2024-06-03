@@ -30,64 +30,73 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({}));
 
-
-export default function CustomizedTables({
-  chain
-}: {
-  chain: string
-}) {
-  console.log(chain, "chan");
+export default function CustomizedTables({ chain }: { chain: string }) {
+  console.log(chain, 'chan');
 
   const [provider, setProvider] = React.useState<any>(undefined);
 
-  const { email, login } = useWeb3auth(2)
+  const { email, login } = useWeb3auth(2);
 
   const handleBuyNft = async (modelId: any, tokenId: any, price: any) => {
     toast.loading('Buying NFT', toastStyles);
-    const _provider = await login(2)
+    const _provider = await login(2);
     const resp = await BuyNft(_provider, tokenId, price);
     try {
-      if (chain.toLowerCase() !== "moonbeam") return
-      const apiResponse = await fetch('https://db-graph-backend.onrender.com/api/update-subscription-moonbeam', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          tokenId,
-          email: email
-        }),
-      });
+      if (chain.toLowerCase() !== 'moonbeam') return;
+      const apiResponse = await fetch(
+        'https://db-graph-backend.onrender.com/api/update-subscription-moonbeam',
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            tokenId,
+            email: email,
+          }),
+        }
+      );
       const responseData = await apiResponse.json();
       if (!apiResponse.ok) {
         throw new Error(responseData.message || 'Failed to purchase NFT');
       }
     } catch (error) {
-      toast.dismiss()
+      toast.dismiss();
       toast.error('Failed to purchase NFT', toastStyles);
     }
     if (resp.dispatch) {
-      toast.dismiss()
+      toast.dismiss();
       toast.success('NFT successfully purchased', toastStyles);
     }
   };
-
 
   const [data, setData] = React.useState([]);
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        if (chain.toLowerCase() !== "moonbeam") {
-          const response = await fetch('https://db-graph-backend.onrender.com/api/listed-subscriptions');
+        if (chain.toLowerCase() !== 'moonbeam') {
+          const response = await fetch(
+            'https://db-graph-backend.onrender.com/api/listed-subscriptions'
+          );
           const jsonData = await response.json();
-          setData(jsonData.data.sort((a, b) => parseFloat(b.price) - parseFloat(a.price)));
-          return
+          setData(
+            jsonData.data.sort(
+              (a, b) => parseFloat(b.price) - parseFloat(a.price)
+            )
+          );
+          return;
         }
         // await login(2)
-        const response = await fetch('https://db-graph-backend.onrender.com/api/listed-subscriptions-moonbeam');
+        const response = await fetch(
+          'https://db-graph-backend.onrender.com/api/listed-subscriptions-moonbeam'
+        );
         const jsonData = await response.json();
-        setData(jsonData.data.sort((a, b) => parseFloat(b.price) - parseFloat(a.price)));
+        setData(
+          jsonData.data.sort(
+            (a, b) => parseFloat(b.price) - parseFloat(a.price)
+          )
+        );
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -95,8 +104,6 @@ export default function CustomizedTables({
 
     fetchData();
   }, [chain]);
-
-  console.log(data, "dataa");
 
   return (
     <TableContainer
@@ -122,9 +129,11 @@ export default function CustomizedTables({
         </TableHead>
         <TableBody>
           {data.map((row) => {
-            const modelData = allModelData.filter((item) => item.id.toString() === row.model.modelId)[0];
+            const modelData = allModelData.filter(
+              (item) => item.id.toString() === row.model.modelId
+            )[0];
 
-            if (!modelData) return null
+            if (!modelData) return null;
             return (
               <StyledTableRow key={modelData.id}>
                 <StyledTableCell component='th' scope='row'>
@@ -146,10 +155,12 @@ export default function CustomizedTables({
                       viewBox='0 0 24 24'
                       strokeWidth={1.5}
                       stroke='currentColor'
-                      className={`${localStorage.getItem(modelData.id.toString()) !== modelData.tokenId
-                        ? 'cursor-not-allowed'
-                        : 'cursor-pointer'
-                        }' hover:text-fuchsia-600 w-5 h-5'`}
+                      className={`${
+                        localStorage.getItem(modelData.id.toString()) !==
+                        modelData.tokenId
+                          ? 'cursor-not-allowed'
+                          : 'cursor-pointer'
+                      }' hover:text-fuchsia-600 w-5 h-5'`}
                     >
                       <path
                         strokeLinecap='round'
@@ -184,16 +195,16 @@ export default function CustomizedTables({
                   </span>
                 </StyledTableCell>
                 <StyledTableCell align='right'>
-                  {parseInt(row.price) - 0.2}
-                  <span className='text-slate-400'>USDC</span>
+                  {modelData.views}
+                  <span className='text-slate-400'>K</span>
                 </StyledTableCell>
                 <StyledTableCell align='right'>
-                  {row.price} USDC
+                  {parseInt(row.price) - 0.2} USDC
                 </StyledTableCell>
                 <StyledTableCell align='right'>--</StyledTableCell>
                 <StyledTableCell align='right'>100%</StyledTableCell>
               </StyledTableRow>
-            )
+            );
           })}
         </TableBody>
       </Table>
