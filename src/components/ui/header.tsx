@@ -41,10 +41,18 @@ type props = {
 };
 
 const Header = ({ isOpen, setIsOpen }: props) => {
-  const { walletAddress: smartAddress } = useGlobalStore()
+  const { walletAddress: smartAddress } = useGlobalStore();
 
-  const { login, loggedIn, logout, name, provider, email, getUserInfo, smartAccount } =
-    useWeb3auth();
+  const {
+    login,
+    loggedIn,
+    logout,
+    name,
+    provider,
+    email,
+    getUserInfo,
+    smartAccount,
+  } = useWeb3auth();
   const [openAiId, setOpenAiId] = useState('');
   const [ipfsUrl, setIpfsUrl] = useState('');
   const [avatarLoading, setAvatarLoading] = useState(false);
@@ -124,7 +132,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
   const fetchUserDetails = async (address: string, email: string) => {
     try {
       setAvatarLoading(true);
-      if (!email) return
+      if (!email) return;
       const resp = await fetch(
         `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
         {
@@ -138,7 +146,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
         setIpfsUrl(data.data.user.ipfs_url);
       } else if (data.message === 'User not found') {
         //call here
-        // createNft();
+        createNft();
       }
     } catch (error) {
       setAvatarLoading(false);
@@ -155,7 +163,6 @@ const Header = ({ isOpen, setIsOpen }: props) => {
       fetchUserDetails(smartAddress, email);
     }
   }, [smartAddress, email, name]);
-
 
   return (
     <div className='w-full flex items-center justify-between bg-[#130D1A] px-6 py-4 lg:py-6 fixed top-0 z-50'>
