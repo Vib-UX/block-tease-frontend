@@ -1153,11 +1153,11 @@ export async function listNft(
     paymasterServiceData: { mode: PaymasterMode.SPONSORED },
   });
   console.log('Bundle transaction sent');
-
+  const listingId = await nftContractInstance.listingId();
   const { transactionHash } = await bundleTransaction.waitForTxHash();
   console.log('Listing Transaction Hash:', transactionHash);
 
-  return { hash: transactionHash };
+  return { hash: transactionHash, listingId: listingId - 1 };
 }
 
 export async function buyNft(

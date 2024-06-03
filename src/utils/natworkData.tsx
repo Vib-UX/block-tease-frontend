@@ -6,6 +6,7 @@ import {
   morphIcon,
   polygonIcon,
   zksyncIcon,
+  PolygonZkevm,
 } from '~/NetworkIcon';
 
 export const coinData = [
@@ -31,6 +32,10 @@ export const coinData = [
     icon: meticIcon,
   },
   {
+    name: 'Polygon_Zkevm',
+    icon: PolygonZkevm,
+  },
+  {
     name: 'ZkSync',
     icon: zksyncIcon,
   },
@@ -38,8 +43,26 @@ export const coinData = [
     name: 'Morph',
     icon: morphIcon,
   },
+];
+
+export const MarketData = [
+  {
+    name: 'Ethereum',
+    icon: ethereumIcon,
+  },
+
+  {
+    name: 'Moonbeam',
+    icon: moonbeamIcon,
+  },
+
+  {
+    name: 'Metis',
+    icon: meticIcon,
+  },
+
   {
     name: 'Polygon_Zkevm',
-    icon: polygonIcon,
+    icon: PolygonZkevm,
   },
 ];
