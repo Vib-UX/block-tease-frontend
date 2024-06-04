@@ -134,7 +134,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
       setAvatarLoading(true);
       if (!email) return;
       const resp = await fetch(
-        `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
+        `https://db-graph-backend.onrender.com/api/user-info-metis?email=${email}`,
         {
           method: 'GET',
         }

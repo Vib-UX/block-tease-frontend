@@ -11,7 +11,7 @@ import * as React from 'react';
 import toast from 'react-hot-toast';
 
 import useWeb3auth from '@/hooks/useWeb3auth';
-import { BuyNft } from '@/lib/func';
+import { buyNftMetis } from '@/lib/func';
 import { toastStyles } from '@/lib/utils';
 
 import BuyModal from '@/components/ui/BuyModal';
@@ -48,18 +48,21 @@ export default function CustomizedTables({ chain }: { chain: string }) {
   const [txHash, setTxHash] = React.useState('')
   const [provider, setProvider] = React.useState<any>(undefined);
 
-  const { email, login } = useWeb3auth(2);
+  const { email, login } = useWeb3auth(3);
 
   const handleBuyNft = async (modelId: any, tokenId: any, price: any) => {
     setProgress(10)
     toast.loading('Buying NFT', toastStyles);
     const _provider = await login(2);
-    const resp = await BuyNft(_provider, tokenId, price);
+    const resp = await buyNftMetis({
+      provider: _provider,
+      tokenId: tokenId
+    });
     try {
-      setTxHash(resp.dispatch)
-      if (chain.toLowerCase() !== 'moonbeam') return;
+      setTxHash(resp.transactionHash)
+      if (chain.toLowerCase() !== 'metis') return;
       const apiResponse = await fetch(
-        'https://db-graph-backend.onrender.com/api/update-subscription-moonbeam',
+        'https://db-graph-backend.onrender.com/api/update-subscription-metis',
         {
           method: 'PATCH',
           headers: {
@@ -81,7 +84,7 @@ export default function CustomizedTables({ chain }: { chain: string }) {
       toast.dismiss();
       toast.error('Failed to purchase NFT', toastStyles);
     }
-    if (resp.dispatch) {
+    if (resp.transactionHash) {
       setProgress(99)
       toast.dismiss();
       toast.success('NFT successfully purchased', toastStyles);
@@ -93,7 +96,20 @@ export default function CustomizedTables({ chain }: { chain: string }) {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        if (chain.toLowerCase() !== 'moonbeam') {
+        if (chain.toLowerCase() === 'moonbeam') {
+          const response = await fetch(
+            'https://db-graph-backend.onrender.com/api/listed-subscriptions'
+          );
+          const jsonData = await response.json();
+          setData(
+            jsonData.data.sort(
+              (a, b) => parseFloat(b.price) - parseFloat(a.price)
+            )
+          );
+          return;
+        }
+
+        if (chain.toLowerCase() !== 'metis') {
           const response = await fetch(
             'https://db-graph-backend.onrender.com/api/listed-subscriptions'
           );
@@ -107,7 +123,7 @@ export default function CustomizedTables({ chain }: { chain: string }) {
         }
         // await login(2)
         const response = await fetch(
-          'https://db-graph-backend.onrender.com/api/listed-subscriptions-moonbeam'
+          'https://db-graph-backend.onrender.com/api/listed-subscriptions-metis'
         );
         const jsonData = await response.json();
         setData(

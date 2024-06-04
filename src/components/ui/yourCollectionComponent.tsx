@@ -29,7 +29,23 @@ const YourCollection = ({
     // const res = await balanceOffModel(provider, modelData.id.toString());
     // setIsUnlocked(res);
     try {
-      if (chain.toLowerCase() !== "moonbeam") {
+      if (chain.toLowerCase() === "moonbeam") {
+        const resp = await fetch(
+          // `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
+          `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
+          {
+            method: 'GET',
+          }
+        );
+        const data = await resp.json();
+        if (data.success) {
+          const result = filterMatchingIds(data.data.subscriptions, allModelData);
+          setData(result);
+        }
+        return
+      }
+
+      if (chain.toLowerCase() !== "metis") {
         const resp = await fetch(
           `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
           // `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
@@ -44,9 +60,10 @@ const YourCollection = ({
         }
         return
       }
+
       const resp = await fetch(
         // `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
-        `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
+        `https://db-graph-backend.onrender.com/api/user-info-metis?email=${email}`,
         {
           method: 'GET',
         }

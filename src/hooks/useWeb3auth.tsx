@@ -90,7 +90,7 @@ function useWeb3auth(chainIndex?: number) {
   console.log(defaultChain, "defaultChain");
 
   const privateKeyProvider: any = new EthereumPrivateKeyProvider({
-    config: { chainConfig: defaultChain },
+    config: { chainConfig: chainConfig[chainIndex ?? 3] },
   });
   const web3auth = new Web3Auth({
     clientId,

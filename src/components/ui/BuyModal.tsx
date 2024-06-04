@@ -1,6 +1,7 @@
 import { Dialog, DialogPanel, Field, Transition, TransitionChild } from '@headlessui/react';
 import Image from 'next/image';
 
+import { chainConfig } from '@/hooks/useWeb3auth';
 import { cn } from '@/lib/utils';
 
 import LinearWithValueLabel from '@/components/ui/progressBar';
@@ -114,7 +115,7 @@ const BuyModal = ({
                       </div>
                     )}
                     {txHash !== "" ? <div className='h-[100px] w-full flex items-center justify-center'>
-                      <a href={'https://moonbase.moonscan.io/tx/' + txHash} target='_blank' className='underline'>Payment Successful</a>
+                      <a href={chainConfig[3].blockExplorerUrl + "/tx/" + txHash} target='_blank' className='underline'>Payment Successful</a>
                     </div> :
                       null
                     }

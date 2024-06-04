@@ -187,6 +187,7 @@ export async function listNftMetis({
   price: any;
   provider: any;
 }) {
+
   const signer = await provider.getSigner();
   const nftContract = new ethers.Contract(
     blockTeaseNftMetisAddr,
@@ -214,7 +215,7 @@ export async function listNftMetis({
     await approvalTx.wait();
     console.log(
       'Approval for all set successfully:',
-      approvalTx.transactionHash
+      approvalTx.hash
     );
   }
 
@@ -255,7 +256,7 @@ export async function buyNftMetis({
     amountNeeded
   );
   await approvalTx.wait();
-  console.log('Approval successful:', approvalTx.transactionHash);
+  console.log('Approval successful:', approvalTx.hash);
   await new Promise((resolve) => setTimeout(resolve, 3000));
   // Buying the NFT
   console.log('Purchasing NFT...');

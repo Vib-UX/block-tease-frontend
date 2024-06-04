@@ -15,8 +15,8 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
-import useWeb3auth from '@/hooks/useWeb3auth';
-import { batchList } from '@/lib/func';
+import useWeb3auth, { chainConfig } from '@/hooks/useWeb3auth';
+import { listNftMetis } from '@/lib/func';
 import { toastStyles } from '@/lib/utils';
 type props = {
   icon: any;
@@ -26,7 +26,7 @@ type props = {
 };
 export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
   const [isOpen, setIsOpen] = useState(false);
-  const { login } = useWeb3auth(2)
+  const { login } = useWeb3auth(3)
   const [txHash, setTxHash] = useState('')
   const [listingPrice, setListingPrice] = React.useState<number>(0);
   const [provider, setProvider] = useState<any>(undefined);
@@ -52,9 +52,13 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
         throw new Error("Provider not initialized")
       }
       toast.loading('Listing your NFT', toastStyles);
-      const resp = await batchList(_provider, tokenId, listingPrice);
+      const resp = await listNftMetis({
+        tokenId: tokenId,
+        price: listingPrice,
+        provider: _provider
+      });
       // API CALL
-      const req = await fetch(`https://db-graph-backend.onrender.com/api/list-subscription-moonbeam`, {
+      const req = await fetch(`https://db-graph-backend.onrender.com/api/list-subscription-metis`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -66,10 +70,8 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
       });
       const response = await req.json()
 
-      if (resp.dispatch) {
-        console.log(resp.dispatch);
-
-        setTxHash(resp.dispatch)
+      if (resp.transactionHash) {
+        setTxHash(resp.transactionHash)
         toast.dismiss();
         toast.success('NFT listed successfully 🚀', toastStyles);
         // localStorage.removeItem(modelId.toString());
@@ -154,7 +156,7 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
                         Starting Price
                       </Description>
                       {txHash !== "" ? <div className='h-[100px] w-full flex items-center justify-center'>
-                        <a href={'https://moonbase.moonscan.io/tx/' + txHash} target='_blank' className='underline'>Payment Success</a>
+                        <a href={chainConfig[3].blockExplorerUrl + "/tx/" + txHash} target='_blank' className='underline'>Payment Success</a>
                       </div> :
                         <div className='relative '>
                           <Input

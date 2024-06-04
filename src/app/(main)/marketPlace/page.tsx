@@ -13,25 +13,26 @@ import { coinData } from '@/utils/natworkData';
 
 function Page() {
   const [collection, setCollection] = useState('Your Collection');
-  const { login } = useWeb3auth(2)
+  const { login } = useWeb3auth(3)
   const [chain, setChain] = useState('')
-
-
 
   return (
     <div className=' border-l border  flex gap-10 flex-col w-full items-start py-6 overflow-x-hidden'>
       <SwiperCoverflow />
       <div className=' flex static    gap-3 ml-12'>
-        {coinData.map((coin) => {
+        {coinData.filter((s) => s.name.toLowerCase() === "metis").map((coin) => {
           return (
             <button
               className='group/button relative inline-flex h-10 w-10 items-center gap-4 justify-center overflow-hidden rounded-lg bg-transparent font-medium text-white transition-all duration-300 hover:w-24'
               key={coin.name}
               onClick={async () => {
                 if (coin.name.toLowerCase() === "moonbeam") {
-                  await login(2)
+                  // await login(2)
                 }
-                setChain(coin.name)
+                if (coin.name.toLowerCase() === "metis") {
+                  // await login(3)
+                }
+                setChain(coin.name.toLowerCase())
               }}
             >
               <div className='absolute left-0 w-7 h-7 p-0.5  rounded-full'>

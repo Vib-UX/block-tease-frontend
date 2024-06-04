@@ -21,7 +21,7 @@ export const coinData = [
     icon: polygonIcon
   },
   {
-    name: "Metis",
+    name: "metis",
     icon: meticIcon
 
   },
