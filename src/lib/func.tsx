@@ -13,11 +13,13 @@ import {
 import nftAbi from '../constant/nft.json';
 import nftMarketPlaceSepoliaAbi from '../constant/NftMarketPlaceSepolia.json';
 import NftsMarketPlaceMoonAbi from '../constant/nftsMarketPlaceAbi.json';
+import NftsMarketPlaceMetisAbi from '../constant/nftsMarketPlaceAbi.json';
 import precompileAbi from '../constant/Precompile.json';
 import purchaseSubsAvaAbi from '../constant/purchaseSubsAva.json';
 import purchaseSubscriptionAbi from '../constant/PurchaseSubscription.json';
 //const provider = new ethers.providers.Web3Provider(window.ethereum);
 import UsdcAvaAbi from '../constant/usdcAva.json';
+import mUSDMetisAbi from '../constant/MockUSD.json';
 import userOnBoardingAbi from '../constant/userOnBoarding.json';
 const nftAutomationAddr = '0xD8D9E346Ad32D1f56bC5Fc959440D0A3A2118981';
 const usdcSepoliaEthAddr = '0x9d24c52916A14afc31D86B5Aa046b252383ee444';
@@ -34,8 +36,10 @@ const batchAddress = '0x0000000000000000000000000000000000000808';
 const precompileAddress = '0x000000000000000000000000000000000000080a';
 // const nftMarketPlaceAddrMoon = '0xc96b21eDA35A43eFfc57d459688e066315106f59';
 const nftMarketPlaceAddrMoon = '0xA524319d310fa96AAf6E25F8af729587C2DEaE8a';
+const nftMarketPlaceAddrMetis = '0x8b6cE7068F22276F00d05eb73F2D4dDD21DEDbEf';
 const nftMarketPlaceAddrSepolia = '0xc36B6BFa0ce8C6bdD8efcCd23CeC2E425768f64a';
 const nft = '0x12B77FEb2c44dC16d57d96a1FedEd3136Ad02FBB';
+const mUSDMetis = '0x56EF69e24c3bCa5135C18574b403273F1eB2Bd74';
 
 type minitingNftProps = {
   modelId: number;
@@ -110,117 +114,47 @@ export async function checkBalances(signer: any) {
   );
   return { subscriptionBalance, signerBalance };
 }
-// export async function batchSubscribe({
-//   modelId,
-//   subscriptionId,
-//   priceInUsd,
-//   provider,
-// }: batchSubscribeProps) {
-//   await checkBalances(provider);
 
-//   const thirdPartyGasSigner = new ethers.Wallet(
-//     process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
-//     provider
-//   );
+export async function purchaseSubscriptionMetis({
+  modelId,
+  subscriptionId,
+  priceInUsd,
+  provider,
+}) {
+  const signer = await provider.getSigner();
+  const tokenContract = new ethers.Contract(mUSDMetis, mUSDMetisAbi, signer);
+  const marketplaceContract = new ethers.Contract(
+    nftMarketPlaceAddrMetis,
+    NftsMarketPlaceMetisAbi,
+    signer
+  );
 
-//   console.log(thirdPartyGasSigner);
-//   const domain = {
-//     name: 'Call Permit Precompile',
-//     version: '1',
-//     chainId: 1287,
-//     verifyingContract: precompileAddress,
-//   };
+  const amountToApprove = ethers.utils.parseUnits(priceInUsd, 8);
+  // Step 1: Approve the marketplace to spend tokens
+  console.log('Initiating approval...');
+  const approvalTx = await tokenContract.approve(
+    NftsMarketPlaceMetisAbi,
+    amountToApprove
+  );
+  await approvalTx.wait();
+  console.log('Approval successful:', approvalTx.hash);
 
-//   const types = {
-//     CallPermit: [
-//       { name: 'from', type: 'address' },
-//       { name: 'to', type: 'address' },
-//       { name: 'value', type: 'uint256' },
-//       { name: 'data', type: 'bytes' },
-//       { name: 'gaslimit', type: 'uint64' },
-//       { name: 'nonce', type: 'uint256' },
-//       { name: 'deadline', type: 'uint256' },
-//     ],
-//   };
+  setTimeout(async () => {
+    // Step 2: Purchase the subscription
+    console.log('Purchasing subscription...');
+    const purchaseTx = await marketplaceContract.purchaseSubscription(
+      modelId,
+      subscriptionId,
+      3600
+    );
+    const receipt = await purchaseTx.wait();
+    console.log(
+      'Subscription purchased successfully:',
+      receipt.transactionHash
+    );
+  }, 2000);
+}
 
-//   const signer = provider.getSigner();
-
-//   const userSigner = signer.getAddress();
-//   const mockUsd = new ethers.Contract(mockUsdAddress, mockUsdAbi, signer);
-
-//   const purchaseSubscription = new ethers.Contract(
-//     purchaseSubscriptionAddress,
-//     purchaseSubscriptionAbi,
-//     signer
-//   );
-
-//   const batch = new ethers.Contract(batchAddress, batchAbi, signer);
-
-//   const priceInMinUnits = ethers.utils.parseUnits(priceInUsd.toString(), 8);
-
-//   const approvalCallData = mockUsd.interface.encodeFunctionData('approve', [
-//     purchaseSubscriptionAddress,
-//     priceInMinUnits,
-//   ]);
-//   //rename to purchaase subs data
-//   const subscribeCallData = purchaseSubscription.interface.encodeFunctionData(
-//     'subscribeWithToken', //puracseSubscrition call this
-//     [modelId, subscriptionId, priceInMinUnits] // send this m,s,duration
-//   );
-
-//   const batchInterface = new ethers.utils.Interface(batchAbi);
-//   const data = batchInterface.encodeFunctionData('batchAll', [
-//     [mockUsdAddress, purchaseSubscriptionAddress], //nftmarketplaceaddr
-//     [],
-//     [approvalCallData, subscribeCallData],
-//     [],
-//   ]);
-
-//   const callPermit = new ethers.Contract(
-//     precompileAddress, // Call Permit contract
-//     precompileAbi,
-//     thirdPartyGasSigner
-//   );
-
-//   const nonce = await callPermit.nonces(userSigner);
-
-//   const gasLimit = 24000000;
-//   const message = {
-//     from: (await provider.getSigner().getAddress()).toString(),
-//     to: batchAddress, // BatchAddress
-//     value: 0,
-//     data,
-//     gaslimit: gasLimit,
-//     nonce,
-//     deadline: '1714762357000', // Randomly created deadline in the future
-//   };
-
-//   const signature = await provider
-//     .getSigner()
-//     ._signTypedData(domain, types, message);
-//   console.log(`Signature hash: ${signature}`);
-
-//   const formattedSignature = ethers.utils.splitSignature(signature);
-
-//   // This gets dispatched using the dApps signer
-//   const dispatch = await callPermit.dispatch(
-//     message.from,
-//     message.to,
-//     message.value,
-//     message.data,
-//     message.gaslimit,
-//     message.deadline,
-//     formattedSignature.v.toString(),
-//     formattedSignature.r,
-//     formattedSignature.s
-//   );
-
-//   await dispatch.wait();
-//   console.log(`Gasless Batch Precompile Transaction hash: ${dispatch.hash}`);
-
-//   await checkBalances(provider);
-//   return { fromAddr: dispatch.from, dispatch: dispatch.hash };
-// }
 export async function batchSubscribeFor({
   modelId,
   subscriptionId,
