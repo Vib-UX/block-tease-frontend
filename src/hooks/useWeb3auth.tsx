@@ -42,18 +42,18 @@ export const chainConfig = [
     rpcTarget: moonbase.rpcUrl,
     displayName: 'Moonbase',
     blockExplorerUrl: moonbase.explorerUrl,
-    ticker: "GLMR",
+    ticker: 'GLMR',
     tickerName: 'GLMR',
   },
   {
     chainNamespace: CHAIN_NAMESPACES.EIP155,
     chainId: '0xE9FE', // hex of 43114
-    rpcTarget: "https://sepolia.metisdevops.link",
+    rpcTarget: 'https://sepolia.metisdevops.link',
     displayName: 'Metis Sepolia',
-    blockExplorerUrl: "https://sepolia-explorer.metisdevops.link",
-    ticker: "METIS",
+    blockExplorerUrl: 'https://sepolia-explorer.metisdevops.link',
+    ticker: 'METIS',
     tickerName: 'METIS',
-  }
+  },
 ];
 
 const config = [
@@ -80,14 +80,13 @@ const config = [
 ];
 
 function useWeb3auth(chainIndex?: number) {
-
   const { setSmartAccount, smartAccount, setWalletAddress } = useGlobalStore();
   const [smartAccountAddress, setSmartAccountAddress] = useState<string | null>(
     null
   );
 
-  const defaultChain = chainConfig[chainIndex ?? 3]
-  console.log(defaultChain, "defaultChain");
+  const defaultChain = chainConfig[chainIndex ?? 3];
+  console.log(defaultChain, 'defaultChain');
 
   const privateKeyProvider: any = new EthereumPrivateKeyProvider({
     config: { chainConfig: chainConfig[chainIndex ?? 3] },
@@ -96,9 +95,14 @@ function useWeb3auth(chainIndex?: number) {
     clientId,
     web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
     privateKeyProvider,
+    uiConfig: {
+      appName: 'BlockTease',
+      mode: 'dark',
+      defaultLanguage: 'en',
+    },
   });
 
-  console.log(web3auth, "web3auth");
+  console.log(web3auth, 'web3auth');
 
   const metamaskAdapter = new MetamaskAdapter({
     clientId,
@@ -107,13 +111,12 @@ function useWeb3auth(chainIndex?: number) {
   const openloginAdapter = new OpenloginAdapter({
     adapterSettings: {
       whiteLabel: {
-        mode: "dark"
-      }
-    }
+        mode: 'dark',
+      },
+    },
   });
   web3auth.configureAdapter(openloginAdapter);
   web3auth.configureAdapter(metamaskAdapter);
-
 
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -131,7 +134,7 @@ function useWeb3auth(chainIndex?: number) {
         setSmartAccountAddress(saAddress);
         setLoggedIn(true);
       }
-      getUserInfo()
+      getUserInfo();
       setProvider(web3auth.provider);
     } catch (error) {
       console.error(error);
@@ -148,41 +151,44 @@ function useWeb3auth(chainIndex?: number) {
     }
   }, [loggedIn]);
 
-  const login = useCallback(async (chainIndex2: number) => {
-    await web3auth.initModal();
-    const web3authProvider = await web3auth.connect();
-    const ethersProvider = new ethers.providers.Web3Provider(
-      web3authProvider as any
-    );
-    const web3AuthSigner = ethersProvider.getSigner();
-    const address = await web3AuthSigner.getAddress()
-    if (chainIndex2 === 2 || chainIndex2 === 3) {
-      setAddress(address)
-      setWalletAddress(address)
+  const login = useCallback(
+    async (chainIndex2: number) => {
+      await web3auth.initModal();
+      const web3authProvider = await web3auth.connect();
+      const ethersProvider = new ethers.providers.Web3Provider(
+        web3authProvider as any
+      );
+      const web3AuthSigner = ethersProvider.getSigner();
+      const address = await web3AuthSigner.getAddress();
+      if (chainIndex2 === 2 || chainIndex2 === 3) {
+        setAddress(address);
+        setWalletAddress(address);
+        setSmartAccountAddress(address);
+      } else {
+        const smartWallet = await createSmartAccountClient({
+          signer: web3AuthSigner,
+          biconomyPaymasterApiKey: config[chainIndex2].biconomyPaymasterApiKey,
+          bundlerUrl: config[chainIndex2].bundlerUrl,
+          rpcUrl: chainConfig[chainIndex2].rpcTarget,
+          chainId: config[chainIndex2].chainId,
+        });
+        setSmartAccount(smartWallet);
+        const saAddress = await smartWallet.getAccountAddress();
+        setSmartAccountAddress(saAddress);
+        setWalletAddress(saAddress);
+      }
+      setAddress(address);
+      setWalletAddress(address);
       setSmartAccountAddress(address);
-    } else {
-      const smartWallet = await createSmartAccountClient({
-        signer: web3AuthSigner,
-        biconomyPaymasterApiKey: config[chainIndex2].biconomyPaymasterApiKey,
-        bundlerUrl: config[chainIndex2].bundlerUrl,
-        rpcUrl: chainConfig[chainIndex2].rpcTarget,
-        chainId: config[chainIndex2].chainId,
-      });
-      setSmartAccount(smartWallet);
-      const saAddress = await smartWallet.getAccountAddress();
-      setSmartAccountAddress(saAddress);
-      setWalletAddress(saAddress)
-    }
-    setAddress(address)
-    setWalletAddress(address)
-    setSmartAccountAddress(address);
-    getUserInfo()
-    setProvider(web3authProvider);
-    if (web3auth.connected) {
-      setLoggedIn(true);
-    }
-    return ethersProvider;
-  }, [chainConfig, config, web3auth]);
+      getUserInfo();
+      setProvider(web3authProvider);
+      if (web3auth.connected) {
+        setLoggedIn(true);
+      }
+      return ethersProvider;
+    },
+    [chainConfig, config, web3auth]
+  );
 
   const getUserInfo = async () => {
     // IMP START - Get User Information
@@ -191,7 +197,7 @@ function useWeb3auth(chainIndex?: number) {
 
     setName(user.name);
     setEmail(user.email);
-    return user
+    return user;
   };
   const getAccounts = async () => {
     if (!provider) {
@@ -225,7 +231,7 @@ function useWeb3auth(chainIndex?: number) {
     address,
     email,
     smartAccount,
-    getUserInfo
+    getUserInfo,
   };
 }
 export default useWeb3auth;
