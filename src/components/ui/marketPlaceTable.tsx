@@ -146,7 +146,10 @@ export default function CustomizedTables() {
         toast.dismiss();
         toast.success('Something went wrong', toastStyles);
       }
-    } catch (err) {}
+    } catch (err) {
+      toast.dismiss();
+      toast.success('Something went wrong', toastStyles);
+    }
   };
   return (
     <TableContainer
