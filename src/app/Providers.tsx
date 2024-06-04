@@ -11,7 +11,7 @@ export const moonbase = {
   chainId: 1287,
   name: 'Moonbase Alpha',
   currency: 'DEV',
-  rpcUrl: 'https://rpc.api.moonbase.moonbeam.network',
+  rpcUrl: 'https://moonbase-alpha.drpc.org',
   explorerUrl: 'https://moonbase.moonscan.io',
 };
 export const polygonAmoy = {
