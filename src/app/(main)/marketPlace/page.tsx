@@ -20,7 +20,7 @@ function Page() {
     <div className=' border-l border  flex gap-10 flex-col w-full items-start py-6 overflow-x-hidden'>
       <SwiperCoverflow />
       <div className=' flex static    gap-3 ml-12'>
-        {coinData.filter((s) => s.name.toLowerCase() === "metis").map((coin) => {
+        {coinData.filter((s) => s.isSupported).map((coin) => {
           return (
             <button
               className='group/button relative inline-flex h-10 w-10 items-center gap-4 justify-center overflow-hidden rounded-lg bg-transparent font-medium text-white transition-all duration-300 hover:w-24'
@@ -30,7 +30,7 @@ function Page() {
                   // await login(2)
                 }
                 if (coin.name.toLowerCase() === "metis") {
-                  // await login(3)
+                  await login(3)
                 }
                 setChain(coin.name.toLowerCase())
               }}

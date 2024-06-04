@@ -156,7 +156,11 @@ function useWeb3auth(chainIndex?: number) {
     );
     const web3AuthSigner = ethersProvider.getSigner();
     const address = await web3AuthSigner.getAddress()
-    if (chainIndex2 !== 2 && chainIndex2 !== 3) {
+    if (chainIndex2 === 2 || chainIndex2 === 3) {
+      setAddress(address)
+      setWalletAddress(address)
+      setSmartAccountAddress(address);
+    } else {
       const smartWallet = await createSmartAccountClient({
         signer: web3AuthSigner,
         biconomyPaymasterApiKey: config[chainIndex2].biconomyPaymasterApiKey,
@@ -168,11 +172,10 @@ function useWeb3auth(chainIndex?: number) {
       const saAddress = await smartWallet.getAccountAddress();
       setSmartAccountAddress(saAddress);
       setWalletAddress(saAddress)
-    } else {
-      setAddress(address)
-      setWalletAddress(address)
-      setSmartAccountAddress(address);
     }
+    setAddress(address)
+    setWalletAddress(address)
+    setSmartAccountAddress(address);
     getUserInfo()
     setProvider(web3authProvider);
     if (web3auth.connected) {

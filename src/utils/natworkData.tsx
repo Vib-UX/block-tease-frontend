@@ -3,36 +3,37 @@ import { avalancheIcon, ethereumIcon, meticIcon, moonbeamIcon, morphIcon, polygo
 export const coinData = [
   {
     name: "avalanche",
-    icon: avalancheIcon
-
+    icon: avalancheIcon,
+    isSupported: false,
   },
   {
     name: "Ethereum",
-    icon: ethereumIcon
-
+    icon: ethereumIcon,
+    isSupported: true,
   },
   {
     name: "Moonbeam",
-    icon: moonbeamIcon
-
+    icon: moonbeamIcon,
+    isSupported: true,
   },
   {
     name: "Polygon",
-    icon: polygonIcon
+    icon: polygonIcon,
+    isSupported: false,
   },
   {
     name: "metis",
-    icon: meticIcon
-
+    icon: meticIcon,
+    isSupported: true,
   },
   {
     name: "ZkSync",
-    icon: zksyncIcon
-
+    icon: zksyncIcon,
+    isSupported: true,
   },
   {
     name: "Morph",
-    icon: morphIcon
-
+    icon: morphIcon,
+    isSupported: false,
   },
 ]
