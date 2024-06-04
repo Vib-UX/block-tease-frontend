@@ -45,7 +45,15 @@ export const chainConfig = [
     ticker: "GLMR",
     tickerName: 'GLMR',
   },
-
+  {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    chainId: '0xE9FE', // hex of 43114
+    rpcTarget: "https://sepolia.metisdevops.link",
+    displayName: 'Metis Sepolia',
+    blockExplorerUrl: "https://sepolia-explorer.metisdevops.link",
+    ticker: "METIS",
+    tickerName: 'METIS',
+  }
 ];
 
 const config = [
@@ -64,6 +72,11 @@ const config = [
     bundlerUrl: `https://bundler.biconomy.io/api/v2/1287/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44`,
     chainId: 1287,
   },
+  {
+    biconomyPaymasterApiKey: 'uPfcURYvC.cbd1a374-9004-4290-93a5-84261ac4609a',
+    bundlerUrl: `https://bundler.biconomy.io/api/v2/59902/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44`,
+    chainId: 59902,
+  },
 ];
 
 function useWeb3auth(chainIndex?: number) {
@@ -73,14 +86,20 @@ function useWeb3auth(chainIndex?: number) {
     null
   );
 
+  const defaultChain = chainConfig[chainIndex ?? 3]
+  console.log(defaultChain, "defaultChain");
+
   const privateKeyProvider: any = new EthereumPrivateKeyProvider({
-    config: { chainConfig: chainConfig[chainIndex ?? 0] },
+    config: { chainConfig: defaultChain },
   });
   const web3auth = new Web3Auth({
     clientId,
     web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
     privateKeyProvider,
   });
+
+  console.log(web3auth, "web3auth");
+
   const metamaskAdapter = new MetamaskAdapter({
     clientId,
     web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
@@ -137,7 +156,7 @@ function useWeb3auth(chainIndex?: number) {
     );
     const web3AuthSigner = ethersProvider.getSigner();
     const address = await web3AuthSigner.getAddress()
-    if (chainIndex2 !== 2) {
+    if (chainIndex2 !== 2 && chainIndex2 !== 3) {
       const smartWallet = await createSmartAccountClient({
         signer: web3AuthSigner,
         biconomyPaymasterApiKey: config[chainIndex2].biconomyPaymasterApiKey,

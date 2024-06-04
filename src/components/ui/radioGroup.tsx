@@ -242,7 +242,7 @@ export default function RadioButton({ walletChosen, value }: { walletChosen: str
         allplans.polygonPlans[0].value = value
         setPlans(allplans.polygonPlans);
         break;
-      case "Metis":
+      case "metis":
         allplans.metisPlans[0].value = value
         setPlans(allplans.metisPlans);
         break;

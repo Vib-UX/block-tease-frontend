@@ -16,11 +16,14 @@ import {
   batchSubscribeFor,
   chainLinkAutomationSubscription,
   checkBalances,
+  checkBalancesMetis,
   checkUserBalanceWeb3Auth,
   getTestFunds,
+  getTestFundsMetis,
   getTestFundsWeb3Auth,
   mintingNft,
   PurchaseSubsAvaGasslessBundle,
+  purchaseSubscriptionMetis,
 } from '@/lib/func';
 import { cn, toastStyles } from '@/lib/utils';
 
@@ -29,7 +32,7 @@ import LinearWithValueLabel from '@/components/ui/progressBar';
 import RadioButton from '@/components/ui/radioGroup';
 import { VanishInput } from '@/components/ui/vanishInput';
 
-import { moonbase, morph } from '@/app/Providers';
+import { morph } from '@/app/Providers';
 import { coinData } from '@/utils/natworkData';
 
 const subscriptionId = Math.floor(Math.random() * (1e12 - 1 + 1)) + 1;
@@ -55,6 +58,7 @@ export default function MyModal({
   const [approvetrx, setApproveTrx] = useState('');
   const [avalancheCrossTxn, setAvalancheCrossTxn] = useState('');
   const [moonbeamTx, setMoonbeamTxn] = useState('');
+  const [metisTx, setMetisTx] = useState('');
   const [chainlinkCrossTxn, setChainLinkCrossTxn] = useState('');
   const [testTokensHash, setTestTokensHash] = useState('');
   const [nftTrx, setNftTrx] = useState('');
@@ -118,6 +122,34 @@ export default function MyModal({
   const showMsgs = () => {
     setProgress(33);
     toast.success('Payment completed successfully', toastStyles);
+  };
+  const chainLinkNotifierMetis = async () => {
+    try {
+      const resp = await fetch(
+        'https://db-graph-backend.onrender.com/api/purchase-subscription-metis',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            modelId: modelId,
+            tokenId: (
+              BigInt(1e18) * BigInt(modelId) +
+              BigInt(subscriptionId)
+            ).toString(),
+          }),
+        }
+      );
+      const data = await resp.json();
+      if (data.success) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      toast.error('Something went wrong', toastStyles);
+    }
   };
   const chainLinkNotifierMoonbeam = async () => {
     try {
@@ -215,6 +247,32 @@ export default function MyModal({
           setIsOpen(true);
           // setIsUnlocked(true);
         }
+      } else if (walletChosen.toLowerCase() === 'metis') {
+        setProgress(10);
+        const _provider = await login(3)
+        if (!_provider) {
+          throw new Error("Provider not initialized")
+        }
+        const resp = await purchaseSubscriptionMetis({
+          modelId: modelId,
+          subscriptionId: subscriptionId,
+          priceInUsd: value,
+          provider: _provider
+        });
+        setMetisTx(resp.dispatch);
+        showMsgs();
+        if (resp.dispatch) {
+          const res = await chainLinkNotifierMetis();
+          // mintNft(resp.fromAddr);
+          setProgress(100);
+          toast.success('Transaction successfull 🚀', toastStyles);
+          // localStorage.setItem(
+          //   modelId.toString(),
+          //   (BigInt(1e18) * BigInt(modelId) + BigInt(subscriptionId)).toString()
+          // );
+          setIsOpen(true);
+          // setIsUnlocked(true);
+        }
       } else if (walletChosen === 'avalanche') {
         setProgress(10);
         // console.log('ava selected?');
@@ -262,6 +320,10 @@ export default function MyModal({
         const _provider = await login(2)
         const signer = _provider.getSigner()
         amount = await checkBalances(signer)
+      } else if (walletChosen.toLowerCase() === "metis") {
+        const _provider = await login(3)
+        const signer = _provider.getSigner()
+        amount = await checkBalancesMetis(signer)
       } else {
         amount = await checkUserBalanceWeb3Auth(smartAccount);
       }
@@ -353,7 +415,7 @@ export default function MyModal({
 
                     <div className='absolute left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 w-full'>
                       {(approvetrx ||
-                        batchGaslessTrx ||
+                        batchGaslessTrx || metisTx ||
                         nftTrx ||
                         avalancheCrossTxn ||
                         chainlinkCrossTxn) && (
@@ -371,7 +433,7 @@ export default function MyModal({
                                     ? `https://ccip.chain.link/tx/${avalancheCrossTxn}`
                                     : walletChosen === 'Ethereum'
                                       ? `${chainConfig[1].blockExplorerUrl}/tx/${chainlinkCrossTxn}`
-                                      : `${moonbase.explorerUrl}/tx/${batchGaslessTrx}`
+                                      : `${chainConfig[3].blockExplorerUrl}/tx/${metisTx}`
                               }
                               target='_blank'
                               className='flex items-center text-white gap-1 hover:underline'
@@ -477,13 +539,15 @@ export default function MyModal({
                                 if (coin.name === 'avalanche') {
                                   setChainIndex(0)
                                   login(0);
-                                } else if (coin.name === 'Ethereum') {
+                                } else if (coin.name === 'ethereum') {
                                   setChainIndex(1)
                                   login(1);
                                 } else if (coin.name.toLowerCase() === "moonbeam") {
                                   setChainIndex(2)
+                                } else if (coin.name.toLowerCase() === "metis") {
+                                  setChainIndex(3)
                                 }
-                                setWalletChosen(coin.name);
+                                setWalletChosen(coin.name.toLowerCase());
                               }}
                               className={`group/button relative  inline-flex  h-10 w-10 items-center justify-center overflow-hidden bg-transparent font-medium text-white transition-all duration-300 hover:w-24 ${walletChosen === coin.name ? 'bg-gray-800' : ''
                                 }`}
@@ -541,6 +605,9 @@ export default function MyModal({
                             if (walletChosen.toLowerCase() === "moonbeam") {
                               const _provider = await login(2)
                               resp = await getTestFunds(_provider)
+                            } else if (walletChosen.toLowerCase() === "metis") {
+                              const _provider = await login(3)
+                              resp = await getTestFundsMetis(_provider)
                             } else {
                               resp = await getTestFundsWeb3Auth(
                                 smartAccount

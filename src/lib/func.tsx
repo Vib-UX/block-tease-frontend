@@ -6,20 +6,18 @@ import { chainConfig } from '@/hooks/useWeb3auth';
 
 import batchAbi from '../constant/Batch.json';
 import nftAutomationAbi from '../constant/MarketplaceAutomation.json';
-import {
+import mUSDMetisAbi, {
   default as mockUsdAbi,
   default as UsdcEthSepoliaAbi,
 } from '../constant/MockUSD.json';
 import nftAbi from '../constant/nft.json';
 import nftMarketPlaceSepoliaAbi from '../constant/NftMarketPlaceSepolia.json';
-import NftsMarketPlaceMoonAbi from '../constant/nftsMarketPlaceAbi.json';
-import NftsMarketPlaceMetisAbi from '../constant/nftsMarketPlaceAbi.json';
+import { default as NftsMarketPlaceMetisAbi, default as NftsMarketPlaceMoonAbi } from '../constant/nftsMarketPlaceAbi.json';
 import precompileAbi from '../constant/Precompile.json';
 import purchaseSubsAvaAbi from '../constant/purchaseSubsAva.json';
 import purchaseSubscriptionAbi from '../constant/PurchaseSubscription.json';
 //const provider = new ethers.providers.Web3Provider(window.ethereum);
 import UsdcAvaAbi from '../constant/usdcAva.json';
-import mUSDMetisAbi from '../constant/MockUSD.json';
 import userOnBoardingAbi from '../constant/userOnBoarding.json';
 const nftAutomationAddr = '0xD8D9E346Ad32D1f56bC5Fc959440D0A3A2118981';
 const usdcSepoliaEthAddr = '0x9d24c52916A14afc31D86B5Aa046b252383ee444';
@@ -94,6 +92,26 @@ export async function mintingNft({
   console.log(resp);
   return { trxHash: resp.transactionHash };
 }
+export async function checkBalancesMetis(signer: any) {
+  const signerAddress = await signer.getAddress();
+  const mockUsd = new ethers.Contract(mUSDMetis, mockUsdAbi, signer);
+  const subscriptionBalance = ethers.utils.formatUnits(
+    await mockUsd.balanceOf(nftMarketPlaceAddrMoon),
+    8
+  );
+  const signerBalance = ethers.utils.formatUnits(
+    await mockUsd.balanceOf(signerAddress),
+    8
+  );
+
+  console.log(
+    `PurchaseSubscription ${nftMarketPlaceAddrMoon} has a balance of: ${subscriptionBalance} mUSD`
+  );
+  console.log(
+    `Account ${signerAddress} has a balance of: ${signerBalance} mUSD`
+  );
+  return { subscriptionBalance, signerBalance };
+}
 export async function checkBalances(signer: any) {
   const signerAddress = await signer.getAddress();
   const mockUsd = new ethers.Contract(mockUsdAddress, mockUsdAbi, signer);
@@ -120,6 +138,11 @@ export async function purchaseSubscriptionMetis({
   subscriptionId,
   priceInUsd,
   provider,
+}: {
+  modelId: any,
+  subscriptionId: any,
+  priceInUsd: any,
+  provider: any,
 }) {
   const signer = await provider.getSigner();
   const tokenContract = new ethers.Contract(mUSDMetis, mUSDMetisAbi, signer);
@@ -129,30 +152,30 @@ export async function purchaseSubscriptionMetis({
     signer
   );
 
-  const amountToApprove = ethers.utils.parseUnits(priceInUsd, 8);
+  const amountToApprove = ethers.utils.parseUnits(priceInUsd.toString(), 8);
   // Step 1: Approve the marketplace to spend tokens
   console.log('Initiating approval...');
   const approvalTx = await tokenContract.approve(
-    NftsMarketPlaceMetisAbi,
+    nftMarketPlaceAddrMetis,
     amountToApprove
   );
   await approvalTx.wait();
   console.log('Approval successful:', approvalTx.hash);
+  await new Promise(resolve => setTimeout(resolve, 5000));
+  // Step 2: Purchase the subscription
+  console.log('Purchasing subscription...');
+  const purchaseTx = await marketplaceContract.purchaseSubscription(
+    modelId,
+    subscriptionId,
+    3600
+  );
+  const receipt = await purchaseTx.wait();
+  console.log(
+    'Subscription purchased successfully:',
+    receipt.transactionHash
+  );
+  return { dispatch: receipt.transactionHash }
 
-  setTimeout(async () => {
-    // Step 2: Purchase the subscription
-    console.log('Purchasing subscription...');
-    const purchaseTx = await marketplaceContract.purchaseSubscription(
-      modelId,
-      subscriptionId,
-      3600
-    );
-    const receipt = await purchaseTx.wait();
-    console.log(
-      'Subscription purchased successfully:',
-      receipt.transactionHash
-    );
-  }, 2000);
 }
 
 export async function batchSubscribeFor({
@@ -328,6 +351,27 @@ export async function checkUserBalanceWeb3Auth(smartAccount: any) {
   );
 
   return { signerBalance };
+}
+
+export async function getTestFundsMetis(provider: any) {
+  const signer = provider.getSigner();
+  const signerAddress = await signer.getAddress();
+
+  const thirdPartyProvider = new ethers.Wallet(
+    process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
+    provider
+  );
+  const signPromise = await thirdPartyProvider.sendTransaction({
+    to: signerAddress,
+    value: ethers.utils.parseUnits("0.01", 18)
+  })
+  const mockUsd = new ethers.Contract(
+    mUSDMetis,
+    mockUsdAbi,
+    thirdPartyProvider
+  );
+  const trx = await mockUsd.transfer(signerAddress, 100e8);
+  return { trxhash: trx.hash };
 }
 export async function getTestFunds(provider: any) {
   const signer = provider.getSigner();
