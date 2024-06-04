@@ -87,6 +87,7 @@ export default function MyModal({
   }
   const [provider, setProvider] = useState<any>(undefined);
   const [loadingState, setLoadingState] = useState<string>('Confirm Payment');
+  const [disbleFundBtn, setDisableFundBtn] = useState(false);
   const placeholders = [
     `We have notified ${name} 💃💌 of your interest. Hold on! ✨`,
     'She has accepted your request! 🎉🎈 Let the fun begin! 💋',
@@ -499,7 +500,11 @@ export default function MyModal({
                         </div>
                       )}
                       {testTokensHash && (
-                        <div className={'flex items-center w-full py-3'}>
+                        <div
+                          className={`flex items-center w-full py-3 ${
+                            progress > 0 && progress < 99 ? 'mt-20' : 'mt-0'
+                          }`}
+                        >
                           <a
                             href={`${chainConfig[chainIndex].blockExplorerUrl}/tx/${testTokensHash}`}
                             target='_blank'
@@ -602,9 +607,15 @@ export default function MyModal({
                         <p>{loadingState}</p>
                       </Button>
                       {loadingState !== 'Confirm Payment' && (
-                        <div
-                          className='text-end hover:underline cursor-pointer text-white'
+                        <button
+                          className={`text-end hover:underline ${
+                            progress > 0 && progress < 99
+                              ? 'cursor-not-allowed'
+                              : 'cursor-pointer'
+                          }  text-white`}
+                          disabled={disbleFundBtn}
                           onClick={async () => {
+                            setDisableFundBtn(true);
                             let resp = {
                               trxhash: '',
                             };
@@ -631,6 +642,7 @@ export default function MyModal({
                               toast.error('Something went wrong', toastStyles);
                               setTestTokensHash('');
                             }
+                            setDisableFundBtn(false);
                           }}
                         >
                           Get test funds{' '}
@@ -655,7 +667,7 @@ export default function MyModal({
                               </g>
                             </g>
                           </svg>
-                        </div>
+                        </button>
                       )}
                     </>
                   ) : progress > 0 && progress < 99 ? (
