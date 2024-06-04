@@ -51,7 +51,7 @@ export default function MyModal({
   modelId: number;
   setIsUnlocked: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [chainIndex, setChainIndex] = useState(3)
+  const [chainIndex, setChainIndex] = useState(3);
   const [isOpen, setIsOpen] = useState(false);
   const [walletChosen, setWalletChosen] = useState('');
   const [batchGaslessTrx, setBatchGaslessTrx] = useState('');
@@ -210,7 +210,7 @@ export default function MyModal({
   const handleOperation = async (walletChosen: string) => {
     try {
       if (!smartAccount) {
-        return
+        return;
       }
       if (walletChosen === 'Morph') {
         setProgress(10);
@@ -223,15 +223,15 @@ export default function MyModal({
         }
       } else if (walletChosen.toLowerCase() === 'moonbeam') {
         setProgress(10);
-        const _provider = await login(2)
+        const _provider = await login(2);
         if (!_provider) {
-          throw new Error("Provider not initialized")
+          throw new Error('Provider not initialized');
         }
         const resp = await batchSubscribeFor({
           modelId: modelId,
           subscriptionId: subscriptionId,
           priceInUsd: value,
-          provider: _provider
+          provider: _provider,
         });
         setBatchGaslessTrx(resp.dispatch);
         showMsgs();
@@ -249,15 +249,15 @@ export default function MyModal({
         }
       } else if (walletChosen.toLowerCase() === 'metis') {
         setProgress(10);
-        const _provider = await login(3)
+        const _provider = await login(3);
         if (!_provider) {
-          throw new Error("Provider not initialized")
+          throw new Error('Provider not initialized');
         }
         const resp = await purchaseSubscriptionMetis({
           modelId: modelId,
           subscriptionId: subscriptionId,
           priceInUsd: value,
-          provider: _provider
+          provider: _provider,
         });
         setMetisTx(resp.dispatch);
         showMsgs();
@@ -313,27 +313,28 @@ export default function MyModal({
   };
   const insufficiantBalance = async () => {
     let amount = {
-      signerBalance: '0'
-    }
+      signerBalance: '0',
+    };
     if (walletChosen) {
-      if (walletChosen.toLowerCase() === "moonbeam") {
-        const _provider = await login(2)
-        const signer = _provider.getSigner()
-        amount = await checkBalances(signer)
-      } else if (walletChosen.toLowerCase() === "metis") {
-        const _provider = await login(3)
-        const signer = _provider.getSigner()
-        amount = await checkBalancesMetis(signer)
+      if (walletChosen.toLowerCase() === 'moonbeam') {
+        const _provider = await login(2);
+        const signer = _provider.getSigner();
+        amount = await checkBalances(signer);
+      } else if (walletChosen.toLowerCase() === 'metis') {
+        const _provider = await login(3);
+        const signer = _provider.getSigner();
+        amount = await checkBalancesMetis(signer);
       } else {
         amount = await checkUserBalanceWeb3Auth(smartAccount);
       }
       if (parseInt(amount.signerBalance) < value) {
         setLoadingState(
-          `Insufficient Funds need ${value - parseInt(amount.signerBalance)
+          `Insufficient Funds need ${
+            value - parseInt(amount.signerBalance)
           }💸 to subscribe`
         );
       } else {
-        setLoadingState("Confirm Payment")
+        setLoadingState('Confirm Payment');
       }
     }
   };
@@ -415,32 +416,64 @@ export default function MyModal({
 
                     <div className='absolute left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 w-full'>
                       {(approvetrx ||
-                        batchGaslessTrx || metisTx ||
+                        batchGaslessTrx ||
+                        metisTx ||
                         nftTrx ||
                         avalancheCrossTxn ||
                         chainlinkCrossTxn) && (
-                          <div
-                            className={`flex items-center ${batchGaslessTrx
+                        <div
+                          className={`flex items-center ${
+                            batchGaslessTrx
                               ? 'justify-center'
                               : 'justify-between'
-                              }  w-full py-3`}
+                          }  w-full py-3`}
+                        >
+                          <a
+                            href={
+                              walletChosen === 'Morph'
+                                ? `${morph.explorerUrl}/tx/${approvetrx}`
+                                : walletChosen === 'avalanche'
+                                ? `https://ccip.chain.link/tx/${avalancheCrossTxn}`
+                                : walletChosen === 'Ethereum'
+                                ? `${chainConfig[1].blockExplorerUrl}/tx/${chainlinkCrossTxn}`
+                                : `${chainConfig[3].blockExplorerUrl}/tx/${metisTx}`
+                            }
+                            target='_blank'
+                            className='flex items-center text-white gap-1 hover:underline'
                           >
+                            {walletChosen === 'Ethereum'
+                              ? 'Autopay Success'
+                              : ' Payment Success'}
+                            <svg
+                              stroke='currentColor'
+                              fill='none'
+                              stroke-width='2'
+                              viewBox='0 0 24 24'
+                              stroke-linecap='round'
+                              stroke-linejoin='round'
+                              height='1em'
+                              width='1em'
+                              xmlns='http://www.w3.org/2000/svg'
+                            >
+                              <path
+                                stroke='none'
+                                d='M0 0h24v24H0z'
+                                fill='none'
+                              ></path>
+                              <path d='M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6'></path>
+                              <path d='M11 13l9 -9'></path>
+                              <path d='M15 4h5v5'></path>
+                            </svg>
+                          </a>
+                          {walletChosen === 'Morph' && (
                             <a
-                              href={
-                                walletChosen === 'Morph'
-                                  ? `${morph.explorerUrl}/tx/${approvetrx}`
-                                  : walletChosen === 'avalanche'
-                                    ? `https://ccip.chain.link/tx/${avalancheCrossTxn}`
-                                    : walletChosen === 'Ethereum'
-                                      ? `${chainConfig[1].blockExplorerUrl}/tx/${chainlinkCrossTxn}`
-                                      : `${chainConfig[3].blockExplorerUrl}/tx/${metisTx}`
-                              }
+                              href={`https://testnets.opensea.io/assets/sepolia/0xB974E8Db0Ad4b573e8AFBC601146Fc8daE2FC4DD/${
+                                BigInt(1e18) * BigInt(5) + BigInt(18)
+                              }`}
                               target='_blank'
                               className='flex items-center text-white gap-1 hover:underline'
                             >
-                              {walletChosen === 'Ethereum'
-                                ? 'Autopay Success'
-                                : ' Payment Success'}
+                              Nft Minted
                               <svg
                                 stroke='currentColor'
                                 fill='none'
@@ -462,43 +495,11 @@ export default function MyModal({
                                 <path d='M15 4h5v5'></path>
                               </svg>
                             </a>
-                            {walletChosen === 'Morph' && (
-                              <a
-                                href={`https://testnets.opensea.io/assets/sepolia/0xB974E8Db0Ad4b573e8AFBC601146Fc8daE2FC4DD/${BigInt(1e18) * BigInt(5) + BigInt(18)
-                                  }`}
-                                target='_blank'
-                                className='flex items-center text-white gap-1 hover:underline'
-                              >
-                                Nft Minted
-                                <svg
-                                  stroke='currentColor'
-                                  fill='none'
-                                  stroke-width='2'
-                                  viewBox='0 0 24 24'
-                                  stroke-linecap='round'
-                                  stroke-linejoin='round'
-                                  height='1em'
-                                  width='1em'
-                                  xmlns='http://www.w3.org/2000/svg'
-                                >
-                                  <path
-                                    stroke='none'
-                                    d='M0 0h24v24H0z'
-                                    fill='none'
-                                  ></path>
-                                  <path d='M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6'></path>
-                                  <path d='M11 13l9 -9'></path>
-                                  <path d='M15 4h5v5'></path>
-                                </svg>
-                              </a>
-                            )}
-                          </div>
-                        )}
+                          )}
+                        </div>
+                      )}
                       {testTokensHash && (
-                        <div
-                          className={`${!nftTrx && 'mt-20'
-                            } 'flex items-center w-full py-3'`}
-                        >
+                        <div className={'flex items-center w-full py-3'}>
                           <a
                             href={`${chainConfig[chainIndex].blockExplorerUrl}/tx/${testTokensHash}`}
                             target='_blank'
@@ -537,20 +538,25 @@ export default function MyModal({
                             <button
                               onClick={() => {
                                 if (coin.name === 'avalanche') {
-                                  setChainIndex(0)
+                                  setChainIndex(0);
                                   login(0);
                                 } else if (coin.name === 'ethereum') {
-                                  setChainIndex(1)
+                                  setChainIndex(1);
                                   login(1);
-                                } else if (coin.name.toLowerCase() === "moonbeam") {
-                                  setChainIndex(2)
-                                } else if (coin.name.toLowerCase() === "metis") {
-                                  setChainIndex(3)
+                                } else if (
+                                  coin.name.toLowerCase() === 'moonbeam'
+                                ) {
+                                  setChainIndex(2);
+                                } else if (
+                                  coin.name.toLowerCase() === 'metis'
+                                ) {
+                                  setChainIndex(3);
                                 }
                                 setWalletChosen(coin.name.toLowerCase());
                               }}
-                              className={`group/button relative  inline-flex  h-10 w-10 items-center justify-center overflow-hidden bg-transparent font-medium text-white transition-all duration-300 hover:w-24 ${walletChosen === coin.name ? 'bg-gray-800' : ''
-                                }`}
+                              className={`group/button relative  inline-flex  h-10 w-10 items-center justify-center overflow-hidden bg-transparent font-medium text-white transition-all duration-300 hover:w-24 ${
+                                walletChosen === coin.name ? 'bg-gray-800' : ''
+                              }`}
                               key={coin.name}
                             >
                               <div className='absolute left-0 w-7 h-7  '>
@@ -590,7 +596,7 @@ export default function MyModal({
                           `z-20 flex items-center justify-center w-full gap-2 rounded-md border-[#FB0393] bg-[#ff16b17c] hover:bg-[#ff16b1a2] py-2 px-10 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none  data-[open]:bg-[#fb039487] data-[focus]:outline-1 data-[focus]:outline-white`,
                           (!walletChosen ||
                             loadingState !== 'Confirm Payment') &&
-                          'cursor-not-allowed opacity-50 '
+                            'cursor-not-allowed opacity-50 '
                         )}
                       >
                         <p>{loadingState}</p>
@@ -600,20 +606,20 @@ export default function MyModal({
                           className='text-end hover:underline cursor-pointer text-white'
                           onClick={async () => {
                             let resp = {
-                              trxhash: ''
+                              trxhash: '',
                             };
-                            if (walletChosen.toLowerCase() === "moonbeam") {
-                              const _provider = await login(2)
-                              resp = await getTestFunds(_provider)
-                            } else if (walletChosen.toLowerCase() === "metis") {
-                              const _provider = await login(3)
-                              resp = await getTestFundsMetis(_provider)
+                            toast.loading('Getting test funds', toastStyles);
+                            if (walletChosen.toLowerCase() === 'moonbeam') {
+                              const _provider = await login(2);
+                              resp = await getTestFunds(_provider);
+                            } else if (walletChosen.toLowerCase() === 'metis') {
+                              const _provider = await login(3);
+                              resp = await getTestFundsMetis(_provider);
                             } else {
-                              resp = await getTestFundsWeb3Auth(
-                                smartAccount
-                              );
+                              resp = await getTestFundsWeb3Auth(smartAccount);
                             }
                             if (resp.trxhash) {
+                              toast.dismiss();
                               toast.success(
                                 'Wooho your funds have arrived 🚀🎉💸',
                                 toastStyles
@@ -621,6 +627,7 @@ export default function MyModal({
                               setTestTokensHash(resp.trxhash);
                               setLoadingState('Confirm Payment');
                             } else {
+                              toast.dismiss();
                               toast.error('Something went wrong', toastStyles);
                               setTestTokensHash('');
                             }
