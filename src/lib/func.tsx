@@ -187,7 +187,6 @@ export async function listNftMetis({
   price: any;
   provider: any;
 }) {
-
   const signer = await provider.getSigner();
   const nftContract = new ethers.Contract(
     blockTeaseNftMetisAddr,
@@ -213,10 +212,7 @@ export async function listNftMetis({
       true
     );
     await approvalTx.wait();
-    console.log(
-      'Approval for all set successfully:',
-      approvalTx.hash
-    );
+    console.log('Approval for all set successfully:', approvalTx.hash);
   }
 
   // Convert price to appropriate units
@@ -446,22 +442,43 @@ export async function getTestFundsMetis(provider: any) {
   const signer = provider.getSigner();
   const signerAddress = await signer.getAddress();
 
+  console.log(`Getting test funds for address: ${signerAddress}`);
+
+  // Setup a third-party provider with its own signer to send transactions
   const thirdPartyProvider = new ethers.Wallet(
     process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
     provider
   );
-  const signPromise = await thirdPartyProvider.sendTransaction({
+
+  // Sending ETH to the signer address
+  console.log('Sending ETH to the signer address...');
+  const ethSendPromise = await thirdPartyProvider.sendTransaction({
     to: signerAddress,
-    value: ethers.utils.parseUnits('0.01', 18),
+    value: ethers.utils.parseUnits('0.01', 18), // Sending 0.01 ETH
   });
+  await ethSendPromise.wait();
+  console.log(
+    `ETH transfer successful, transaction hash: ${ethSendPromise.hash}`
+  );
+
+  // Creating an instance of the mock USD token contract to transfer tokens
   const mockUsd = new ethers.Contract(
     mUSDMetis,
     mockUsdAbi,
     thirdPartyProvider
   );
-  const trx = await mockUsd.transfer(signerAddress, 100e8);
-  return { trxhash: trx.hash };
+
+  // Transferring mock USD to the signer address
+  console.log('Transferring mock USD to the signer address...');
+  const mockUsdTransferPromise = await mockUsd.transfer(signerAddress, 100e8); // 100 tokens 8 decimals
+  await mockUsdTransferPromise.wait();
+  console.log(
+    `Mock USD transfer successful, transaction hash: ${mockUsdTransferPromise.hash}`
+  );
+
+  return { trxhash: mockUsdTransferPromise.hash };
 }
+
 export async function getTestFunds(provider: any) {
   const signer = provider.getSigner();
   const signerAddress = await signer.getAddress();
