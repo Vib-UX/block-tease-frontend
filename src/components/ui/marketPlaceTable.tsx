@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Image from 'next/image';
 import * as React from 'react';
-
+import BuyModal from '@/components/ui/BuyModal';
 import { buyNft } from '@/lib/func';
 
 import useWeb3auth from '@/hooks/useWeb3auth';
@@ -78,6 +78,18 @@ export default function CustomizedTables() {
   const [data, setData] = React.useState([]);
   const { smartAccount, login } = useWeb3auth();
   const { smartAddress } = useGlobalStore();
+  const [progress, setProgress] = React.useState(0);
+
+  const [selectActiveData, setSelectActiveData] = React.useState<any>({
+    id: '',
+    tokenId: '',
+    price: '',
+    icon: '',
+    name: '',
+    listingPrice: '',
+  });
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [txHash, setTxHash] = React.useState('');
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -104,32 +116,37 @@ export default function CustomizedTables() {
     price: string
   ) => {
     login(1);
-
+    setProgress(10);
     toast.loading('Buying NFT', toastStyles);
     const resp = await buyNft(smartAccount, listingId, price);
-    if (resp.hash) {
-      const result = await fetch(
-        'https://db-graph-backend.onrender.com/api/update-subscription',
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            tokenId: tokenId,
-            wallet_address: smartAddress,
-          }),
+    try {
+      if (resp.hash) {
+        setTxHash(resp.hash);
+        const result = await fetch(
+          'https://db-graph-backend.onrender.com/api/update-subscription',
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              tokenId: tokenId,
+              wallet_address: smartAddress,
+            }),
+          }
+        );
+        setProgress(66);
+        const data = await result.json();
+        if (data.success) {
+          setProgress(99);
+          toast.dismiss();
+          toast.success('NFT successfully purchased', toastStyles);
         }
-      );
-      const data = await result.json();
-      if (data.success) {
+      } else {
         toast.dismiss();
-        toast.success('NFT successfully purchased', toastStyles);
+        toast.success('Something went wrong', toastStyles);
       }
-    } else {
-      toast.dismiss();
-      toast.success('Something went wrong', toastStyles);
-    }
+    } catch (err) {}
   };
   return (
     <TableContainer
@@ -137,6 +154,37 @@ export default function CustomizedTables() {
       className='w-[1100px]  bg-[#130D1A] text-white border-fuchsia-700 border'
       sx={{ border: 'none' }}
     >
+      {' '}
+      {selectActiveData.icon !== '' && (
+        <BuyModal
+          txHash={txHash}
+          progress={progress}
+          listingPrice={selectActiveData.listingPrice}
+          icon={selectActiveData.icon}
+          isOpen={isOpen}
+          onClick={() => {
+            handleBuyNft(
+              selectActiveData.tokenId,
+              selectActiveData.listingPrice,
+              selectActiveData.price
+            );
+          }}
+          onClose={() => {
+            setIsOpen(false);
+            setProgress(0);
+            setTxHash('');
+            setSelectActiveData({
+              icon: '',
+              id: '',
+              listingPrice: '',
+              name: '',
+              price: '',
+              tokenId: '',
+            });
+          }}
+          name={selectActiveData.name}
+        />
+      )}
       <Table
         sx={{ minWidth: 100, border: 'none' }}
         aria-label='customized table'
@@ -173,20 +221,23 @@ export default function CustomizedTables() {
                   <div className='flex items-center  gap-2 '>
                     {modelData.name}
                     <svg
-                      onClick={() =>
-                        handleBuyNft(row.tokenId, row.listingId, row.price)
-                      }
+                      onClick={() => {
+                        setIsOpen(true);
+                        setSelectActiveData({
+                          id: modelData.id.toString(),
+                          tokenId: row.tokenId,
+                          price: row.price,
+                          icon: modelData.icon,
+                          name: modelData.name,
+                          listingPrice: row.listingId,
+                        });
+                      }}
                       xmlns='http://www.w3.org/2000/svg'
                       fill='none'
                       viewBox='0 0 24 24'
                       strokeWidth={1.5}
                       stroke='currentColor'
-                      className={`${
-                        localStorage.getItem(modelData.id.toString()) !==
-                        modelData.tokenId
-                          ? 'cursor-not-allowed'
-                          : 'cursor-pointer'
-                      }' hover:text-fuchsia-600 w-5 h-5'`}
+                      className={`${'cursor-pointer'}' hover:text-fuchsia-600 w-5 h-5'`}
                     >
                       <path
                         strokeLinecap='round'
