@@ -25,7 +25,7 @@ function Page() {
         {coinData.map((coin) => {
           return (
             <button
-              className='group/button relative z-40  inline-flex h-10 w-10 items-center gap-4 justify-center overflow-hidden rounded-lg bg-transparent font-medium text-white transition-all duration-300 hover:w-24'
+              className='group/button relative inline-flex h-10 w-10 items-center gap-4 justify-center overflow-hidden rounded-lg bg-transparent font-medium text-white transition-all duration-300 hover:w-24'
               key={coin.name}
               onClick={async () => {
                 if (coin.name.toLowerCase() === "moonbeam") {

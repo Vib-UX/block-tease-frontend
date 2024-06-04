@@ -14,6 +14,8 @@ import useWeb3auth from '@/hooks/useWeb3auth';
 import { BuyNft } from '@/lib/func';
 import { toastStyles } from '@/lib/utils';
 
+import BuyModal from '@/components/ui/BuyModal';
+
 import { allModelData } from '@/utils/modelData';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -31,17 +33,30 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const StyledTableRow = styled(TableRow)(({ theme }) => ({}));
 
 export default function CustomizedTables({ chain }: { chain: string }) {
-  console.log(chain, 'chan');
+  const [progress, setProgress] = React.useState(0);
 
+
+  const [selectActiveData, setSelectActiveData] = React.useState({
+    id: "",
+    tokenId: "",
+    price: "",
+    icon: '',
+    name: '',
+    listingPrice: ""
+  })
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [txHash, setTxHash] = React.useState('')
   const [provider, setProvider] = React.useState<any>(undefined);
 
   const { email, login } = useWeb3auth(2);
 
   const handleBuyNft = async (modelId: any, tokenId: any, price: any) => {
+    setProgress(10)
     toast.loading('Buying NFT', toastStyles);
     const _provider = await login(2);
     const resp = await BuyNft(_provider, tokenId, price);
     try {
+      setTxHash(resp.dispatch)
       if (chain.toLowerCase() !== 'moonbeam') return;
       const apiResponse = await fetch(
         'https://db-graph-backend.onrender.com/api/update-subscription-moonbeam',
@@ -56,15 +71,18 @@ export default function CustomizedTables({ chain }: { chain: string }) {
           }),
         }
       );
+      setProgress(66)
       const responseData = await apiResponse.json();
       if (!apiResponse.ok) {
         throw new Error(responseData.message || 'Failed to purchase NFT');
       }
+      toast.dismiss()
     } catch (error) {
       toast.dismiss();
       toast.error('Failed to purchase NFT', toastStyles);
     }
     if (resp.dispatch) {
+      setProgress(99)
       toast.dismiss();
       toast.success('NFT successfully purchased', toastStyles);
     }
@@ -111,6 +129,32 @@ export default function CustomizedTables({ chain }: { chain: string }) {
       className='w-[1100px]  bg-[#130D1A] text-white border-fuchsia-700 border'
       sx={{ border: 'none' }}
     >
+      {selectActiveData.icon !== "" &&
+        <BuyModal
+          txHash={txHash}
+          progress={progress}
+          listingPrice={selectActiveData.listingPrice}
+          icon={selectActiveData.icon}
+          isOpen={isOpen}
+          onClick={() => {
+            handleBuyNft(selectActiveData.id, selectActiveData.tokenId, selectActiveData.price)
+          }}
+          onClose={() => {
+            setIsOpen(false)
+            setProgress(0)
+            setTxHash("")
+            setSelectActiveData({
+              icon: "",
+              id: "",
+              listingPrice: "",
+              name: "",
+              price: "",
+              tokenId: ""
+            })
+          }}
+          name={selectActiveData.name}
+        />
+      }
       <Table
         sx={{ minWidth: 100, border: 'none' }}
         aria-label='customized table'
@@ -147,20 +191,30 @@ export default function CustomizedTables({ chain }: { chain: string }) {
                   <div className='flex items-center  gap-2 '>
                     {modelData.name}
                     <svg
-                      onClick={() =>
-                        handleBuyNft(modelData.id, row.tokenId, row.price)
+                      onClick={() => {
+                        setIsOpen(true)
+                        setSelectActiveData(
+                          {
+                            id: modelData.id,
+                            tokenId: row.tokenId,
+                            price: row.price,
+                            icon: modelData.icon,
+                            name: modelData.name,
+                            listingPrice: parseInt(row.price)
+                          }
+                        )
+                      }
                       }
                       xmlns='http://www.w3.org/2000/svg'
                       fill='none'
                       viewBox='0 0 24 24'
                       strokeWidth={1.5}
                       stroke='currentColor'
-                      className={`${
-                        localStorage.getItem(modelData.id.toString()) !==
+                      className={`${localStorage.getItem(modelData.id.toString()) !==
                         modelData.tokenId
-                          ? 'cursor-not-allowed'
-                          : 'cursor-pointer'
-                      }' hover:text-fuchsia-600 w-5 h-5'`}
+                        ? 'cursor-not-allowed'
+                        : 'cursor-pointer'
+                        }' hover:text-fuchsia-600 w-5 h-5'`}
                     >
                       <path
                         strokeLinecap='round'
