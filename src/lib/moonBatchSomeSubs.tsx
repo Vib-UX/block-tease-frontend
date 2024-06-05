@@ -111,7 +111,7 @@ export async function executeSubscriptions(subscriptions: any, provider: any) {
   console.log(`Total Approval Gasless Transaction completed. Hash: ${dispatch.hash}`);
 
   // Proceed with subscriptions using batchSome
-  let to = [],
+  const to = [],
     callData = [];
 
   subscriptions.forEach((sub) => {
