@@ -195,7 +195,7 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
                     </Field>
                   </div>
 
-                  {txHash && (
+                  {txHash === '' && (
                     <button
                       className=' cursor-pointer h-[37px] w-full group/button relative overflow-hidden rounded-md bg-[rgb(48,20,47)] bg-gradient-to-br from-[rgba(48,20,47,1)] from-[0%] to-[rgba(17,12,23,1)] to-[57%] px-5 py-1.5 text-xs font-medium text-[#CEB9E9] transition-all hover:border-red-500 active:scale-95'
                       onClick={handleListing}

@@ -232,7 +232,7 @@ export default function CustomizedTables() {
                           price: row.price,
                           icon: modelData.icon,
                           name: modelData.name,
-                          listingPrice: row.listingId,
+                          listingPrice: row.price,
                         });
                       }}
                       xmlns='http://www.w3.org/2000/svg'
