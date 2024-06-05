@@ -2,12 +2,18 @@ import { ethers } from 'ethers';
 import nftMarketPlaceAbi from '../constant/nftsMarketPlaceAbi.json';
 import batchAbi from '../constant/Batch.json';
 import callPermitAbi from '../constant/Precompile.json';
+import {
+  default as mockUsdAbi,
+} from '../constant/MockUSD.json';
+import { checkBalances } from '@/lib/func';
 
 const batchAddress = '0x0000000000000000000000000000000000000808';
 const precompileAddress = '0x000000000000000000000000000000000000080a';
-const nftMarketPlaceAddrMoon = '0x8208834c529664385fd2CA735EFB64a41d79823b';
+const nftMarketPlaceAddrMoon = '0xA524319d310fa96AAf6E25F8af729587C2DEaE8a';
+const mockUsdAddress = '0xf7409b94F7285d27Ab1A456638A1110A4E55bFEC';
 
 export async function executeSubscriptions(subscriptions: any, provider: any) {
+
   console.log("Initializing gasless subscription execution process.");
 
   const thirdPartyGasSigner = new ethers.Wallet(
@@ -15,11 +21,14 @@ export async function executeSubscriptions(subscriptions: any, provider: any) {
     provider
   );
   console.log(`Third-party gas signer initialized: ${thirdPartyGasSigner.address}`);
-
+  
   const signer = provider.getSigner();
   const userSigner = await signer.getAddress();
   console.log(`User signer retrieved: ${userSigner}`);
+  
+  await checkBalances(signer);
 
+  const mockUsd = new ethers.Contract(mockUsdAddress, mockUsdAbi, signer);
   const nftMarketPlace = new ethers.Contract(
     nftMarketPlaceAddrMoon, // NFT Marketplace Address
     nftMarketPlaceAbi,
@@ -69,7 +78,7 @@ export async function executeSubscriptions(subscriptions: any, provider: any) {
   const totalMinUnits = ethers.utils.parseUnits(totalAmount.toString(), 8);
   console.log(`Total amount for approval calculated: ${totalAmount} USD`);
 
-  const approvalCallData = nftMarketPlace.interface.encodeFunctionData(
+  const approvalCallData = mockUsd.interface.encodeFunctionData(
     'approve',
     [nftMarketPlaceAddrMoon, totalMinUnits]
   );
@@ -80,12 +89,12 @@ export async function executeSubscriptions(subscriptions: any, provider: any) {
   let nonce = await callPermit.nonces(userSigner);
   let message = {
     from: userSigner,
-    to: nftMarketPlaceAddrMoon,
+    to: mockUsdAddress,
     value: 0,
     data: approvalCallData,
     gaslimit: 24000000,
     nonce,
-    deadline: (Date.now() / 1000 + 7200).toString(), // 2 hours from now in seconds
+    deadline: '1714762357000', 
   };
 
   console.log("Message for total approval prepared, proceeding to sign...");
@@ -102,7 +111,7 @@ export async function executeSubscriptions(subscriptions: any, provider: any) {
     message.data,
     message.gaslimit,
     message.deadline,
-    formattedSignature.v,
+    formattedSignature.v.toString(),
     formattedSignature.r,
     formattedSignature.s
   );
@@ -145,7 +154,7 @@ export async function executeSubscriptions(subscriptions: any, provider: any) {
     data: batchData,
     gaslimit: 24000000,
     nonce,
-    deadline: (Date.now() / 1000 + 7200).toString(),
+    deadline: '1714762357000',
   };
 
   console.log("Message for batch processing of subscriptions prepared, proceeding to sign...");
@@ -162,11 +171,13 @@ export async function executeSubscriptions(subscriptions: any, provider: any) {
     message.data,
     message.gaslimit,
     message.deadline,
-    formattedSignature.v,
+    formattedSignature.v.toString(),
     formattedSignature.r,
     formattedSignature.s
   );
 
   await dispatch.wait();
   console.log(`BatchSome Subscription Gasless Transaction completed. Hash: ${dispatch.hash}`);
+  await checkBalances(signer);
+  return { fromAddr: dispatch.from, dispatch: dispatch.hash };
 }
