@@ -17,7 +17,6 @@ function Page() {
   const [chain, setChain] = useState('')
 
 
-
   return (
     <div className=' border-l border  flex gap-10 flex-col w-full items-start py-6 overflow-x-hidden'>
       <SwiperCoverflow />
