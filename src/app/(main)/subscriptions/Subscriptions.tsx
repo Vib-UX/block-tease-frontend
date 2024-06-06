@@ -32,7 +32,7 @@ const Subscriptions = () => {
         return {
           modelId: card.modelId,           // Unique identifier for the model
           subscriptionId: subscriptionId,  // Randomly generated using the subscription function
-          priceInUsd: card.price
+          priceInUsd: card.modelPrice
         }
       })
       const receipt = await executeSubscriptions(subscriptions, provider)
@@ -56,7 +56,7 @@ const Subscriptions = () => {
       const subscriptions = {
         modelId: card.modelId,           // Unique identifier for the model
         subscriptionId: subscriptionId,  // Randomly generated using the subscription function
-        priceInUsd: card.price
+        priceInUsd: card.modelPrice
       }
       const receipt = await executeSubscriptions([subscriptions], provider)
       setTxHash(receipt.dispatch)
@@ -79,7 +79,7 @@ const Subscriptions = () => {
   };
 
   const totalAmt = selectedCards.reduce((prev, curr) => {
-    return prev + parseFloat(curr.price)
+    return prev + (curr.modelPrice)
   }, 0)
 
   return (
