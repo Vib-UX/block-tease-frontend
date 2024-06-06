@@ -30,6 +30,7 @@ const filterMatchingIds = (array1: any, array2: any) => {
 const useGetSubscriptions = () => {
   const { email } = useWeb3auth()
   return useQuery([email, "subscription"], async (): Promise<CardData[]> => {
+    if (!email) return []
     const response = await fetch(
       `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`
     );

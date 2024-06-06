@@ -240,6 +240,12 @@ const Header = ({ isOpen, setIsOpen }: props) => {
             avatarLoading={avatarLoading}
           />
         )}
+        <Link href="/subscriptions" style={{ position: 'relative' }}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white" className="h-6 w-6">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158l-1 .877V11a6 6 0 10-12 0v4.035l-1-.877a2.032 2.032 0 01-.595-1.753L4 17h5m6 0a2 2 0 104 0" />
+          </svg>
+          <span style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', backgroundColor: 'red', borderRadius: '50%' }}></span>
+        </Link>
         <button
           onClick={() =>
             !smartAddress ? login(0) : handleCopy(smartAddress || '')
