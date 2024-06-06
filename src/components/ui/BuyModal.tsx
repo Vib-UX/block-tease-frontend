@@ -35,13 +35,19 @@ const BuyModal = ({
   cta?: string;
   isOpen: boolean;
 }) => {
-  const placeholders = [
+  const placeholders = name ? [
     `We have notified ${name ?? ''} 💃💌 of your interest. Hold on! ✨`,
     'She has accepted your request! 🎉🎈 Let the fun begin! 💋',
     `${name ?? ''} 💃👯‍♀️ is getting ready for you. Relax! ⏳💆`,
     `She's right around the corner 👠. Sit tight! 💺💃`,
     'She is ready!🍾 Head over and enjoy the show! 🎵🥂',
-  ];
+  ] : [
+    `We have notified ${name ? `${name}s` : ''} 💃💌 of your interest. Hold on! ✨`,
+    'They have accepted your request! 🎉🎈 Let the fun begin! 💋',
+    `${name ? `${name}s` : ''} 💃👯‍♀️ are getting ready for you. Relax! ⏳💆`,
+    `They're right around the corner 👠. Sit tight! 💺💃`,
+    'They are ready!🍾 Head over and enjoy the show! 🎵🥂',
+  ];;
 
   return (
     <Transition appear show={isOpen}>
