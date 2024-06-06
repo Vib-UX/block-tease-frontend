@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query';
 
 import useWeb3auth from '@/hooks/useWeb3auth';
+import { getModalPayment } from '@/lib/func';
 
 import { allModelData } from '@/utils/modelData';
 
@@ -16,6 +17,7 @@ export interface CardData {
     image: string;
     name: string
   }
+  modelPrice: number
 }
 
 const filterMatchingIds = (array1: any, array2: any) => {
@@ -30,6 +32,7 @@ const filterMatchingIds = (array1: any, array2: any) => {
 const useGetSubscriptions = () => {
   const { email } = useWeb3auth()
   return useQuery([email, "subscription"], async (): Promise<CardData[]> => {
+    if (!email) return []
     const response = await fetch(
       `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`
     );
@@ -41,7 +44,8 @@ const useGetSubscriptions = () => {
         throw new Error('Failed to fetch data');
       }
       const ipfsData = await response.json(); // Await the json data
-      return { ...card, ipfsData }; // Spread the card data and add ipfsData
+      const price = await getModalPayment(parseInt(card.modelId))
+      return { ...card, ipfsData, modelPrice: parseFloat(price) }; // Spread the card data and add ipfsData
     }));
 
     return data;
