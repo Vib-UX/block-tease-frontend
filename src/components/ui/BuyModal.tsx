@@ -1,3 +1,4 @@
+'use client';
 import {
   Dialog,
   DialogPanel,
@@ -7,10 +8,14 @@ import {
 } from '@headlessui/react';
 import Image from 'next/image';
 
-import { cn } from '@/lib/utils';
+import { cn, toastStyles } from '@/lib/utils';
 
 import LinearWithValueLabel from '@/components/ui/progressBar';
 import { VanishInput } from '@/components/ui/vanishInput';
+import useWeb3auth, { chainConfig } from '@/hooks/useWeb3auth';
+import { getTestFunds } from '@/lib/func';
+import toast from 'react-hot-toast';
+import { useState } from 'react';
 
 const BuyModal = ({
   txHash,
@@ -23,6 +28,8 @@ const BuyModal = ({
   onClose,
   listingPrice,
   cta,
+  routeUsed,
+  setLoadingState,
 }: {
   progress: number;
   txHash: string;
@@ -34,6 +41,8 @@ const BuyModal = ({
   name?: string;
   cta?: string;
   isOpen: boolean;
+  routeUsed?: string;
+  setLoadingState?: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const placeholders = name
     ? [
@@ -50,7 +59,7 @@ const BuyModal = ({
         `They're right around the corner 👠. Sit tight! 💺💃`,
         'They are ready!🍾 Head over and enjoy the show! 🎵🥂',
       ];
-
+  const [testTokensHash, setTestTokensHash] = useState('');
   return (
     <Transition appear show={isOpen}>
       <Dialog
@@ -74,7 +83,13 @@ const BuyModal = ({
                 }}
                 className='w-full relative max-w-xl text-white z-50 space-y-10 rounded-xl bg-white/5 px-10 py-14 backdrop-blur-2xl'
               >
-                <h1 className='text-2xl text-white'>{cta ? cta : 'Buy NFT'}</h1>
+                <h1 className='text-2xl text-white'>
+                  {routeUsed === 'subs'
+                    ? 'Buy Subscription'
+                    : cta
+                    ? cta
+                    : 'Buy NFT'}
+                </h1>
                 <div className=' flex justify-between'>
                   <div className='flex items-center justify-center'>
                     {icons ? (
@@ -158,7 +173,34 @@ const BuyModal = ({
                       </div>
                     )}
                     {txHash !== '' ? (
-                      <div className='h-[100px] w-full flex items-center justify-center'>
+                      <div className='h-[100px] w-full flex items-center justify-between'>
+                        <a
+                          href={`${chainConfig[2].blockExplorerUrl}/tx/${testTokensHash}`}
+                          target='_blank'
+                          className='underline flex items-center gap-x-2'
+                        >
+                          Test funds{' '}
+                          <svg
+                            stroke='currentColor'
+                            fill='none'
+                            stroke-width='2'
+                            viewBox='0 0 24 24'
+                            stroke-linecap='round'
+                            stroke-linejoin='round'
+                            height='1em'
+                            width='1em'
+                            xmlns='http://www.w3.org/2000/svg'
+                          >
+                            <path
+                              stroke='none'
+                              d='M0 0h24v24H0z'
+                              fill='none'
+                            ></path>
+                            <path d='M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6'></path>
+                            <path d='M11 13l9 -9'></path>
+                            <path d='M15 4h5v5'></path>
+                          </svg>
+                        </a>
                         <a
                           href={'https://moonbase.moonscan.io/tx/' + txHash}
                           target='_blank'
@@ -180,6 +222,50 @@ const BuyModal = ({
                       {cta ? cta : ' Buy NFT'}
                     </span>
                   </button>
+                )}
+                {cta?.includes('Insufficient') && (
+                  <div
+                    className='text-white text-end hover:underline cursor-pointer'
+                    onClick={async () => {
+                      toast.loading('Getting test funds', toastStyles);
+                      const { login } = useWeb3auth(2);
+                      const _provider = await login(2);
+                      const resp = await getTestFunds(_provider);
+                      if (resp.trxhash) {
+                        toast.dismiss();
+                        toast.success(
+                          'Wooho your funds have arrived 🚀🎉💸',
+                          toastStyles
+                        );
+                        setTestTokensHash(resp.trxhash);
+                        if (setLoadingState) {
+                          setLoadingState('Confirm Payment');
+                        }
+                      } else {
+                        toast.dismiss();
+                        toast.error('Something went wrong', toastStyles);
+                        setTestTokensHash('');
+                      }
+                    }}
+                  >
+                    Get test funds{' '}
+                    <svg
+                      aria-label='USDC'
+                      width='.4em'
+                      height='.5em'
+                      viewBox='0 0 32 32'
+                      xmlns='http://www.w3.org/2000/svg'
+                      className='inline-block size-[.7lh] shrink-0'
+                    >
+                      <g fill='none'>
+                        <circle cx='16' cy='16' r='16' fill='#3E73C4'></circle>
+                        <g fill='#FFF'>
+                          <path d='M20.022 18.124c0-2.124-1.28-2.852-3.84-3.156c-1.828-.243-2.193-.728-2.193-1.578c0-.85.61-1.396 1.828-1.396c1.097 0 1.707.364 2.011 1.275a.458.458 0 0 0 .427.303h.975a.416.416 0 0 0 .427-.425v-.06a3.04 3.04 0 0 0-2.743-2.489V9.142c0-.243-.183-.425-.487-.486h-.915c-.243 0-.426.182-.487.486v1.396c-1.829.242-2.986 1.456-2.986 2.974c0 2.002 1.218 2.791 3.778 3.095c1.707.303 2.255.668 2.255 1.639c0 .97-.853 1.638-2.011 1.638c-1.585 0-2.133-.667-2.316-1.578c-.06-.242-.244-.364-.427-.364h-1.036a.416.416 0 0 0-.426.425v.06c.243 1.518 1.219 2.61 3.23 2.914v1.457c0 .242.183.425.487.485h.915c.243 0 .426-.182.487-.485V21.34c1.829-.303 3.047-1.578 3.047-3.217z'></path>
+                          <path d='M12.892 24.497c-4.754-1.7-7.192-6.98-5.424-11.653c.914-2.55 2.925-4.491 5.424-5.402c.244-.121.365-.303.365-.607v-.85c0-.242-.121-.424-.365-.485c-.061 0-.183 0-.244.06a10.895 10.895 0 0 0-7.13 13.717c1.096 3.4 3.717 6.01 7.13 7.102c.244.121.488 0 .548-.243c.061-.06.061-.122.061-.243v-.85c0-.182-.182-.424-.365-.546zm6.46-18.936c-.244-.122-.488 0-.548.242c-.061.061-.061.122-.061.243v.85c0 .243.182.485.365.607c4.754 1.7 7.192 6.98 5.424 11.653c-.914 2.55-2.925 4.491-5.424 5.402c-.244.121-.365.303-.365.607v.85c0 .242.121.424.365.485c.061 0 .183 0 .244-.06a10.895 10.895 0 0 0 7.13-13.717c-1.096-3.46-3.778-6.07-7.13-7.162z'></path>
+                        </g>
+                      </g>
+                    </svg>
+                  </div>
                 )}
               </DialogPanel>
             </TransitionChild>
