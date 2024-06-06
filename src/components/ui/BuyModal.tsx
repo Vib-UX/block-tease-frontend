@@ -60,6 +60,25 @@ const BuyModal = ({
         'They are ready!🍾 Head over and enjoy the show! 🎵🥂',
       ];
   const [testTokensHash, setTestTokensHash] = useState('');
+  const { login } = useWeb3auth(2);
+  const handleGetFunds = async () => {
+    toast.loading('Getting test funds', toastStyles);
+
+    const _provider = await login(2);
+    const resp = await getTestFunds(_provider);
+    if (resp.trxhash) {
+      toast.dismiss();
+      toast.success('Wooho your funds have arrived 🚀🎉💸', toastStyles);
+      setTestTokensHash(resp.trxhash);
+      if (setLoadingState) {
+        setLoadingState('Confirm Payment');
+      }
+    } else {
+      toast.dismiss();
+      toast.error('Something went wrong', toastStyles);
+      setTestTokensHash('');
+    }
+  };
   return (
     <Transition appear show={isOpen}>
       <Dialog
@@ -226,26 +245,8 @@ const BuyModal = ({
                 {cta?.includes('Insufficient') && (
                   <div
                     className='text-white text-end hover:underline cursor-pointer'
-                    onClick={async () => {
-                      toast.loading('Getting test funds', toastStyles);
-                      const { login } = useWeb3auth(2);
-                      const _provider = await login(2);
-                      const resp = await getTestFunds(_provider);
-                      if (resp.trxhash) {
-                        toast.dismiss();
-                        toast.success(
-                          'Wooho your funds have arrived 🚀🎉💸',
-                          toastStyles
-                        );
-                        setTestTokensHash(resp.trxhash);
-                        if (setLoadingState) {
-                          setLoadingState('Confirm Payment');
-                        }
-                      } else {
-                        toast.dismiss();
-                        toast.error('Something went wrong', toastStyles);
-                        setTestTokensHash('');
-                      }
+                    onClick={() => {
+                      handleGetFunds();
                     }}
                   >
                     Get test funds{' '}
