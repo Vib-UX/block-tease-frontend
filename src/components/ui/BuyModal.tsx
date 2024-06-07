@@ -191,35 +191,37 @@ const BuyModal = ({
                         <LinearWithValueLabel progress={progress} />
                       </div>
                     )}
+                    {testTokensHash && (
+                      <a
+                        href={`${chainConfig[2].blockExplorerUrl}/tx/${testTokensHash}`}
+                        target='_blank'
+                        className='underline flex items-center gap-x-2'
+                      >
+                        Test funds{' '}
+                        <svg
+                          stroke='currentColor'
+                          fill='none'
+                          stroke-width='2'
+                          viewBox='0 0 24 24'
+                          stroke-linecap='round'
+                          stroke-linejoin='round'
+                          height='1em'
+                          width='1em'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            stroke='none'
+                            d='M0 0h24v24H0z'
+                            fill='none'
+                          ></path>
+                          <path d='M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6'></path>
+                          <path d='M11 13l9 -9'></path>
+                          <path d='M15 4h5v5'></path>
+                        </svg>
+                      </a>
+                    )}
                     {txHash !== '' ? (
                       <div className='h-[100px] w-full flex items-center justify-between'>
-                        <a
-                          href={`${chainConfig[2].blockExplorerUrl}/tx/${testTokensHash}`}
-                          target='_blank'
-                          className='underline flex items-center gap-x-2'
-                        >
-                          Test funds{' '}
-                          <svg
-                            stroke='currentColor'
-                            fill='none'
-                            stroke-width='2'
-                            viewBox='0 0 24 24'
-                            stroke-linecap='round'
-                            stroke-linejoin='round'
-                            height='1em'
-                            width='1em'
-                            xmlns='http://www.w3.org/2000/svg'
-                          >
-                            <path
-                              stroke='none'
-                              d='M0 0h24v24H0z'
-                              fill='none'
-                            ></path>
-                            <path d='M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6'></path>
-                            <path d='M11 13l9 -9'></path>
-                            <path d='M15 4h5v5'></path>
-                          </svg>
-                        </a>
                         <a
                           href={'https://moonbase.moonscan.io/tx/' + txHash}
                           target='_blank'
