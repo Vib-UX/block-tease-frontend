@@ -92,7 +92,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
           if (resp.success) {
             //call register api here
             const reps = await fetch(
-              'https://db-graph-backend.onrender.com/api/register',
+              'https://db-graph-backend-production.up.railway.app/api/register',
               {
                 method: 'POST',
                 headers: {
@@ -134,7 +134,7 @@ const Header = ({ isOpen, setIsOpen }: props) => {
       setAvatarLoading(true);
       if (!email) return;
       const resp = await fetch(
-        `https://db-graph-backend.onrender.com/api/user-info-metis?email=${email}`,
+        `https://db-graph-backend-production.up.railway.app/api/user-info-metis?email=${email}`,
         {
           method: 'GET',
         }

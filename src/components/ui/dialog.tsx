@@ -131,7 +131,7 @@ export default function MyModal({
   const chainLinkNotifierMetis = async () => {
     try {
       const resp = await fetch(
-        'https://db-graph-backend.onrender.com/api/purchase-subscription-metis',
+        'https://db-graph-backend-production.up.railway.app/api/purchase-subscription-metis',
         {
           method: 'POST',
           headers: {
@@ -159,7 +159,7 @@ export default function MyModal({
   const chainLinkNotifierCardona = async () => {
     try {
       const resp = await fetch(
-        'https://db-graph-backend.onrender.com/api/purchase-subscription-cardona',
+        'https://db-graph-backend-production.up.railway.app/api/purchase-subscription-cardona',
         {
           method: 'POST',
           headers: {
@@ -187,7 +187,7 @@ export default function MyModal({
   const chainLinkNotifierMoonbeam = async () => {
     try {
       const resp = await fetch(
-        'https://db-graph-backend.onrender.com/api/purchase-subscription-moonbeam',
+        'https://db-graph-backend-production.up.railway.app/api/purchase-subscription-moonbeam',
         {
           method: 'POST',
           headers: {
@@ -215,7 +215,7 @@ export default function MyModal({
   const chainLinkNotifier = async () => {
     try {
       const resp = await fetch(
-        'https://db-graph-backend.onrender.com/api/purchase-subscription',
+        'https://db-graph-backend-production.up.railway.app/api/purchase-subscription',
         {
           method: 'POST',
           headers: {

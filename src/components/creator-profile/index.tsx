@@ -29,7 +29,7 @@ const CreatorProfile = ({ params }: Props) => {
     // setIsUnlocked(res);
     try {
       const resp = await fetch(
-        `https://db-graph-backend.onrender.com/api/user-info-metis?email=${email}`,
+        `https://db-graph-backend-production.up.railway.app/api/user-info-cardona?email=${email}`,
         {
           method: 'GET',
         }

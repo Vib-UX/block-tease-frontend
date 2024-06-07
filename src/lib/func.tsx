@@ -302,15 +302,19 @@ export async function listNftCardona({
     nftAbi,
     signer
   );
+  console.log(nftContract)
   const marketplaceContract = new ethers.Contract(
     nftMarketPlaceAddrCardona,
     NftsMarketPlaceMetisAbi,
     signer
   );
 
+  const signerAddr = await signer.getAddress();
+  console.log(signerAddr)
+  console.log(nftMarketPlaceAddrCardona)
   // Check if the marketplace is already approved to manage all NFTs
   const isApproved = await nftContract.isApprovedForAll(
-    await signer.getAddress(),
+    signerAddr,
     nftMarketPlaceAddrCardona
   );
 
@@ -378,7 +382,7 @@ export async function buyNftCardona({
   provider: any;
 }) {
   const signer = await provider.getSigner();
-  const tokenContract = new ethers.Contract(mUSDMetis, mUSDMetisAbi, signer);
+  const tokenContract = new ethers.Contract(mUSDCardona, mUSDMetisAbi, signer);
   const marketplaceContract = new ethers.Contract(
     nftMarketPlaceAddrCardona,
     NftsMarketPlaceMetisAbi,
@@ -386,7 +390,9 @@ export async function buyNftCardona({
   );
 
   // Get listing details
+  console.log(tokenId)
   const listing = await marketplaceContract.listings(tokenId);
+  console.log(listing)
   const amountNeeded = listing.price.toString();
 
   // Approve the payment amount

@@ -47,21 +47,21 @@ export default function CustomizedTables({ chain }: { chain: string }) {
   const [txHash, setTxHash] = React.useState('');
   const [provider, setProvider] = React.useState<any>(undefined);
 
-  const { email, login } = useWeb3auth(3);
+  const { email, login } = useWeb3auth(4);
 
   const handleBuyNft = async (modelId: any, tokenId: any, price: any) => {
     setProgress(10);
     toast.loading('Buying NFT', toastStyles);
-    const _provider = await login(2);
+    const _provider = await login(4);
     const resp = await buyNftCardona({
       provider: _provider,
       tokenId: tokenId,
     });
     try {
       setTxHash(resp.transactionHash);
-      if (chain.toLowerCase() !== 'metis') return;
+      if (chain.toLowerCase() !== 'cardona') return;
       const apiResponse = await fetch(
-        'https://db-graph-backend.onrender.com/api/update-subscription-cardona',
+        'https://db-graph-backend-production.up.railway.app/api/update-subscription-cardona',
         {
           method: 'PATCH',
           headers: {
@@ -97,7 +97,7 @@ export default function CustomizedTables({ chain }: { chain: string }) {
       try {
         if (chain.toLowerCase() === 'moonbeam') {
           const response = await fetch(
-            'https://db-graph-backend.onrender.com/api/listed-subscriptions'
+            'https://db-graph-backend-production.up.railway.app/api/listed-subscriptions-moonbeam'
           );
           const jsonData = await response.json();
           setData(
@@ -107,10 +107,21 @@ export default function CustomizedTables({ chain }: { chain: string }) {
           );
           return;
         }
-
+        if (chain.toLowerCase() === 'cardona') {
+          const response = await fetch(
+            'https://db-graph-backend-production.up.railway.app/api/listed-subscriptions-cardona'
+          );
+          const jsonData = await response.json();
+          setData(
+            jsonData.data.sort(
+              (a, b) => parseFloat(b.price) - parseFloat(a.price)
+            )
+          );
+          return;
+        }
         if (chain.toLowerCase() !== 'metis') {
           const response = await fetch(
-            'https://db-graph-backend.onrender.com/api/listed-subscriptions'
+            'https://db-graph-backend-production.up.railway.app/api/listed-subscriptions'
           );
           const jsonData = await response.json();
           setData(
@@ -121,15 +132,7 @@ export default function CustomizedTables({ chain }: { chain: string }) {
           return;
         }
         // await login(2)
-        const response = await fetch(
-          'https://db-graph-backend.onrender.com/api/listed-subscriptions-metis'
-        );
-        const jsonData = await response.json();
-        setData(
-          jsonData.data.sort(
-            (a, b) => parseFloat(b.price) - parseFloat(a.price)
-          )
-        );
+        
       } catch (error) {
         console.error('Error fetching data:', error);
       }

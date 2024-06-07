@@ -33,7 +33,7 @@ export default function ListingDialog({
   chain,
 }: props) {
   const [isOpen, setIsOpen] = useState(false);
-  const { login } = useWeb3auth(3);
+  const { login } = useWeb3auth(4);
   const [txHash, setTxHash] = useState('');
   const [listingPrice, setListingPrice] = React.useState<number>(0);
   const [provider, setProvider] = useState<any>(undefined);
@@ -54,7 +54,7 @@ export default function ListingDialog({
   }, []);
   const handleListing = async () => {
     try {
-      const _provider = await login(2);
+      const _provider = await login(4);
       if (!_provider) {
         throw new Error('Provider not initialized');
       }
@@ -67,7 +67,7 @@ export default function ListingDialog({
         });
         // API CALL
         const req = await fetch(
-          `https://db-graph-backend.onrender.com/api/list-subscription-cardona`,
+          `https://db-graph-backend-production.up.railway.app/api/list-subscription-cardona`,
           {
             method: 'PATCH',
             headers: {
@@ -96,7 +96,7 @@ export default function ListingDialog({
         });
         // API CALL
         const req = await fetch(
-          `https://db-graph-backend.onrender.com/api/list-subscription-metis`,
+          `https://db-graph-backend-production.up.railway.app/api/list-subscription-metis`,
           {
             method: 'PATCH',
             headers: {

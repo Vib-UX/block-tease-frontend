@@ -29,8 +29,8 @@ const YourCollection = ({ chain }: { chain: string }) => {
     try {
       if (chain.toLowerCase() === 'moonbeam') {
         const resp = await fetch(
-          // `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
-          `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
+          // `https://db-graph-backend-production.up.railway.app/api/user-info?wallet_address=${address}&email=${email}`,
+          `https://db-graph-backend-production.up.railway.app/api/user-info-moonbeam?email=${email}`,
           {
             method: 'GET',
           }
@@ -48,8 +48,8 @@ const YourCollection = ({ chain }: { chain: string }) => {
 
       if (chain.toLowerCase() === 'cardona') {
         const resp = await fetch(
-          `https://db-graph-backend.onrender.com/api/user-info-cardona?email=${email}`,
-          // `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
+          `https://db-graph-backend-production.up.railway.app/api/user-info-cardona?email=${email}`,
+          // `https://db-graph-backend-production.up.railway.app/api/user-info-moonbeam?email=${email}`,
           {
             method: 'GET',
           }
@@ -66,8 +66,8 @@ const YourCollection = ({ chain }: { chain: string }) => {
       }
       if (chain.toLowerCase() === 'metis') {
         const resp = await fetch(
-          // `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
-          `https://db-graph-backend.onrender.com/api/user-info-metis?email=${email}`,
+          // `https://db-graph-backend-production.up.railway.app/api/user-info?wallet_address=${address}&email=${email}`,
+          `https://db-graph-backend-production.up.railway.app/api/user-info-metis?email=${email}`,
           {
             method: 'GET',
           }
@@ -83,8 +83,8 @@ const YourCollection = ({ chain }: { chain: string }) => {
         return;
       }
       const resp = await fetch(
-        `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}&email=${email}`,
-        // `https://db-graph-backend.onrender.com/api/user-info-moonbeam?email=${email}`,
+        `https://db-graph-backend-production.up.railway.app/api/user-info?wallet_address=${address}&email=${email}`,
+        // `https://db-graph-backend-production.up.railway.app/api/user-info-moonbeam?email=${email}`,
         {
           method: 'GET',
         }
