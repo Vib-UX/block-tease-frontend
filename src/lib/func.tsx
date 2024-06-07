@@ -38,10 +38,13 @@ const precompileAddress = '0x000000000000000000000000000000000000080a';
 // const nftMarketPlaceAddrMoon = '0xc96b21eDA35A43eFfc57d459688e066315106f59';
 const nftMarketPlaceAddrMoon = '0xA524319d310fa96AAf6E25F8af729587C2DEaE8a';
 const nftMarketPlaceAddrMetis = '0x8b6cE7068F22276F00d05eb73F2D4dDD21DEDbEf';
+const nftMarketPlaceAddrCardona = '0x054ba199Ef61ef15226e2CeB61138f7d5E2F8408';
 const nftMarketPlaceAddrSepolia = '0xc36B6BFa0ce8C6bdD8efcCd23CeC2E425768f64a';
 const nft = '0x12B77FEb2c44dC16d57d96a1FedEd3136Ad02FBB';
 const mUSDMetis = '0x56EF69e24c3bCa5135C18574b403273F1eB2Bd74';
+const mUSDCardona = '0x3FA6cfdC28Ad346c4360AA0543b5BfdA551c7111';
 const blockTeaseNftMetisAddr = '0xF99b791257ab50be7F235BC825E7d4B83942cf38';
+const blockTeaseNftCardonaAddr = '0x5192Ffbc96b2E731649714B7b51d4cC4CA1fAB8F';
 
 type minitingNftProps = {
   modelId: number;
@@ -99,6 +102,26 @@ export async function mintingNft({
 export async function checkBalancesMetis(signer: any) {
   const signerAddress = await signer.getAddress();
   const mockUsd = new ethers.Contract(mUSDMetis, mockUsdAbi, signer);
+  const subscriptionBalance = ethers.utils.formatUnits(
+    await mockUsd.balanceOf(nftMarketPlaceAddrMoon),
+    8
+  );
+  const signerBalance = ethers.utils.formatUnits(
+    await mockUsd.balanceOf(signerAddress),
+    8
+  );
+
+  console.log(
+    `PurchaseSubscription ${nftMarketPlaceAddrMoon} has a balance of: ${subscriptionBalance} mUSD`
+  );
+  console.log(
+    `Account ${signerAddress} has a balance of: ${signerBalance} mUSD`
+  );
+  return { subscriptionBalance, signerBalance };
+}
+export async function checkBalancesCardona(signer: any) {
+  const signerAddress = await signer.getAddress();
+  const mockUsd = new ethers.Contract(mUSDCardona, mockUsdAbi, signer);
   const subscriptionBalance = ethers.utils.formatUnits(
     await mockUsd.balanceOf(nftMarketPlaceAddrMoon),
     8
@@ -177,7 +200,46 @@ export async function purchaseSubscriptionMetis({
   console.log('Subscription purchased successfully:', receipt.transactionHash);
   return { dispatch: receipt.transactionHash };
 }
+export async function purchaseSubscriptionCardona({
+  modelId,
+  subscriptionId,
+  priceInUsd,
+  provider,
+}: {
+  modelId: any;
+  subscriptionId: any;
+  priceInUsd: any;
+  provider: any;
+}) {
+  const signer = await provider.getSigner();
+  const tokenContract = new ethers.Contract(mUSDCardona, mUSDMetisAbi, signer);
+  const marketplaceContract = new ethers.Contract(
+    nftMarketPlaceAddrCardona,
+    NftsMarketPlaceMetisAbi,
+    signer
+  );
 
+  const amountToApprove = ethers.utils.parseUnits(priceInUsd.toString(), 8);
+  // Step 1: Approve the marketplace to spend tokens
+  console.log('Initiating approval...');
+  const approvalTx = await tokenContract.approve(
+    nftMarketPlaceAddrCardona,
+    amountToApprove
+  );
+  await approvalTx.wait();
+  console.log('Approval successful:', approvalTx.transactionHash);
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+  // Step 2: Purchase the subscription
+  console.log('Purchasing subscription...');
+  const purchaseTx = await marketplaceContract.purchaseSubscription(
+    modelId,
+    subscriptionId,
+    3600
+  );
+  const receipt = await purchaseTx.wait();
+  console.log('Subscription purchased successfully:', receipt.transactionHash);
+  return { dispatch: receipt.transactionHash };
+}
 export async function listNftMetis({
   tokenId,
   price,
@@ -225,7 +287,53 @@ export async function listNftMetis({
 
   return { transactionHash: listTx.hash };
 }
+export async function listNftCardona({
+  tokenId,
+  price,
+  provider,
+}: {
+  tokenId: any;
+  price: any;
+  provider: any;
+}) {
+  const signer = await provider.getSigner();
+  const nftContract = new ethers.Contract(
+    blockTeaseNftCardonaAddr,
+    nftAbi,
+    signer
+  );
+  const marketplaceContract = new ethers.Contract(
+    nftMarketPlaceAddrCardona,
+    NftsMarketPlaceMetisAbi,
+    signer
+  );
 
+  // Check if the marketplace is already approved to manage all NFTs
+  const isApproved = await nftContract.isApprovedForAll(
+    await signer.getAddress(),
+    nftMarketPlaceAddrCardona
+  );
+
+  if (!isApproved) {
+    console.log('Setting approval for all...');
+    const approvalTx = await nftContract.setApprovalForAll(
+      nftMarketPlaceAddrCardona,
+      true
+    );
+    await approvalTx.wait();
+    console.log('Approval for all set successfully:', approvalTx.hash);
+  }
+
+  // Convert price to appropriate units
+  const listPrice = ethers.utils.parseUnits(price.toString(), 8);
+
+  console.log('Listing NFT...');
+  const listTx = await marketplaceContract.listNFT(tokenId, listPrice);
+  await listTx.wait();
+  console.log('NFT listed successfully:', listTx.transactionHash);
+
+  return { transactionHash: listTx.hash };
+}
 export async function buyNftMetis({
   tokenId,
   provider,
@@ -262,7 +370,42 @@ export async function buyNftMetis({
 
   return { transactionHash: receipt.transactionHash };
 }
+export async function buyNftCardona({
+  tokenId,
+  provider,
+}: {
+  tokenId: any;
+  provider: any;
+}) {
+  const signer = await provider.getSigner();
+  const tokenContract = new ethers.Contract(mUSDMetis, mUSDMetisAbi, signer);
+  const marketplaceContract = new ethers.Contract(
+    nftMarketPlaceAddrCardona,
+    NftsMarketPlaceMetisAbi,
+    signer
+  );
 
+  // Get listing details
+  const listing = await marketplaceContract.listings(tokenId);
+  const amountNeeded = listing.price.toString();
+
+  // Approve the payment amount
+  console.log('Approving NFT purchase...');
+  const approvalTx = await tokenContract.approve(
+    nftMarketPlaceAddrCardona,
+    amountNeeded
+  );
+  await approvalTx.wait();
+  console.log('Approval successful:', approvalTx.hash);
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  // Buying the NFT
+  console.log('Purchasing NFT...');
+  const purchaseTx = await marketplaceContract.buyNFTWithUSDC(tokenId);
+  const receipt = await purchaseTx.wait();
+  console.log('NFT purchased successfully:', receipt.transactionHash);
+
+  return { transactionHash: receipt.transactionHash };
+}
 export async function batchSubscribeFor({
   modelId,
   subscriptionId,
@@ -478,7 +621,46 @@ export async function getTestFundsMetis(provider: any) {
 
   return { trxhash: mockUsdTransferPromise.hash };
 }
+export async function getTestFundsCardona(provider: any) {
+  const signer = provider.getSigner();
+  const signerAddress = await signer.getAddress();
 
+  console.log(`Getting test funds for address: ${signerAddress}`);
+
+  // Setup a third-party provider with its own signer to send transactions
+  const thirdPartyProvider = new ethers.Wallet(
+    process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
+    provider
+  );
+
+  // Sending ETH to the signer address
+  console.log('Sending ETH to the signer address...');
+  const ethSendPromise = await thirdPartyProvider.sendTransaction({
+    to: signerAddress,
+    value: ethers.utils.parseUnits('0.01', 18), // Sending 0.01 ETH
+  });
+  await ethSendPromise.wait();
+  console.log(
+    `ETH transfer successful, transaction hash: ${ethSendPromise.hash}`
+  );
+
+  // Creating an instance of the mock USD token contract to transfer tokens
+  const mockUsd = new ethers.Contract(
+    mUSDCardona,
+    mockUsdAbi,
+    thirdPartyProvider
+  );
+
+  // Transferring mock USD to the signer address
+  console.log('Transferring mock USD to the signer address...');
+  const mockUsdTransferPromise = await mockUsd.transfer(signerAddress, 100e8); // 100 tokens 8 decimals
+  await mockUsdTransferPromise.wait();
+  console.log(
+    `Mock USD transfer successful, transaction hash: ${mockUsdTransferPromise.hash}`
+  );
+
+  return { trxhash: mockUsdTransferPromise.hash };
+}
 export async function getTestFunds(provider: any) {
   const signer = provider.getSigner();
   const signerAddress = await signer.getAddress();

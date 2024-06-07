@@ -16,18 +16,25 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 import useWeb3auth, { chainConfig } from '@/hooks/useWeb3auth';
-import { listNftMetis } from '@/lib/func';
+import { listNftCardona, listNftMetis } from '@/lib/func';
 import { toastStyles } from '@/lib/utils';
 type props = {
   icon: any;
   name: string;
   tokenId: string;
   modelId: number;
+  chain: string;
 };
-export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
+export default function ListingDialog({
+  icon,
+  name,
+  modelId,
+  tokenId,
+  chain,
+}: props) {
   const [isOpen, setIsOpen] = useState(false);
-  const { login } = useWeb3auth(3)
-  const [txHash, setTxHash] = useState('')
+  const { login } = useWeb3auth(3);
+  const [txHash, setTxHash] = useState('');
   const [listingPrice, setListingPrice] = React.useState<number>(0);
   const [provider, setProvider] = useState<any>(undefined);
 
@@ -47,41 +54,73 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
   }, []);
   const handleListing = async () => {
     try {
-      const _provider = await login(2)
+      const _provider = await login(2);
       if (!_provider) {
-        throw new Error("Provider not initialized")
+        throw new Error('Provider not initialized');
       }
       toast.loading('Listing your NFT', toastStyles);
-      const resp = await listNftMetis({
-        tokenId: tokenId,
-        price: listingPrice,
-        provider: _provider
-      });
-      // API CALL
-      const req = await fetch(`https://db-graph-backend.onrender.com/api/list-subscription-metis`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          "tokenId": tokenId,
-          "price": listingPrice
-        })
-      });
-      const response = await req.json()
-
-      if (resp.transactionHash) {
-        setTxHash(resp.transactionHash)
-        toast.dismiss();
-        toast.success('NFT listed successfully 🚀', toastStyles);
-        // localStorage.removeItem(modelId.toString());
+      if (chain === 'cardona') {
+        const resp = await listNftCardona({
+          tokenId: tokenId,
+          price: listingPrice,
+          provider: _provider,
+        });
+        // API CALL
+        const req = await fetch(
+          `https://db-graph-backend.onrender.com/api/list-subscription-cardona`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              tokenId: tokenId,
+              price: listingPrice,
+            }),
+          }
+        );
+        if (resp.transactionHash) {
+          setTxHash(resp.transactionHash);
+          toast.dismiss();
+          toast.success('NFT listed successfully 🚀', toastStyles);
+          // localStorage.removeItem(modelId.toString());
+        } else {
+          toast.dismiss();
+          toast.error('Something went wrong', toastStyles);
+        }
       } else {
-        toast.dismiss();
-        toast.error('Something went wrong', toastStyles);
+        const resp = await listNftMetis({
+          tokenId: tokenId,
+          price: listingPrice,
+          provider: _provider,
+        });
+        // API CALL
+        const req = await fetch(
+          `https://db-graph-backend.onrender.com/api/list-subscription-metis`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              tokenId: tokenId,
+              price: listingPrice,
+            }),
+          }
+        );
+        if (resp.transactionHash) {
+          setTxHash(resp.transactionHash);
+          toast.dismiss();
+          toast.success('NFT listed successfully 🚀', toastStyles);
+          // localStorage.removeItem(modelId.toString());
+        } else {
+          toast.dismiss();
+          toast.error('Something went wrong', toastStyles);
+        }
       }
     } catch (error) {
       toast.dismiss();
-      console.error(error)
+      console.error(error);
       toast.error('Something went wrong', toastStyles);
     }
   };
@@ -155,15 +194,31 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
                       <Description className='text-sm/6 text-white/50'>
                         Starting Price
                       </Description>
-                      {txHash !== "" ? <div className='h-[100px] w-full flex items-center justify-center'>
-                        <a href={chainConfig[3].blockExplorerUrl + "/tx/" + txHash} target='_blank' className='underline'>Payment Success</a>
-                      </div> :
+                      {txHash !== '' ? (
+                        <div className='h-[100px] w-full flex items-center justify-center'>
+                          <a
+                            href={
+                              chain === 'cardona'
+                                ? chainConfig[4].blockExplorerUrl +
+                                  '/tx/' +
+                                  txHash
+                                : chainConfig[3].blockExplorerUrl +
+                                  '/tx/' +
+                                  txHash
+                            }
+                            target='_blank'
+                            className='underline'
+                          >
+                            Payment Success
+                          </a>
+                        </div>
+                      ) : (
                         <div className='relative '>
                           <Input
                             type='number'
                             placeholder='Amount'
                             onChange={(e) => {
-                              setListingPrice(e.target.value)
+                              setListingPrice(e.target.value);
                             }}
                             className={clsx(
                               'mt-3 block w-[80%] rounded-l-lg border border-[#dbd2d2] bg-white/5 py-1.5 px-3 text-sm/6 text-white',
@@ -202,19 +257,20 @@ export default function ListingDialog({ icon, name, modelId, tokenId }: props) {
                             </p>
                           </div>
                         </div>
-                      }
+                      )}
                     </Field>
                   </div>
-                  {txHash === "" && <button
-                    className=' cursor-pointer h-[37px] w-full group/button relative overflow-hidden rounded-md bg-[rgb(48,20,47)] bg-gradient-to-br from-[rgba(48,20,47,1)] from-[0%] to-[rgba(17,12,23,1)] to-[57%] px-5 py-1.5 text-xs font-medium text-[#CEB9E9] transition-all hover:border-red-500 active:scale-95'
-                    onClick={handleListing}
-                  >
-                    <span className='absolute w-full bottom-0 left-0 z-0 h-0  bg-[#fb0393] transition-all duration-200 group-hover/button:h-full' />
-                    <span className='relative w-full flex gap-2 justify-center items-center z-10 transition-all duration-500 group-hover/button:text-white'>
-                      Complete Listing
-                    </span>
-                  </button>
-                  }
+                  {txHash === '' && (
+                    <button
+                      className=' cursor-pointer h-[37px] w-full group/button relative overflow-hidden rounded-md bg-[rgb(48,20,47)] bg-gradient-to-br from-[rgba(48,20,47,1)] from-[0%] to-[rgba(17,12,23,1)] to-[57%] px-5 py-1.5 text-xs font-medium text-[#CEB9E9] transition-all hover:border-red-500 active:scale-95'
+                      onClick={handleListing}
+                    >
+                      <span className='absolute w-full bottom-0 left-0 z-0 h-0  bg-[#fb0393] transition-all duration-200 group-hover/button:h-full' />
+                      <span className='relative w-full flex gap-2 justify-center items-center z-10 transition-all duration-500 group-hover/button:text-white'>
+                        Complete Listing
+                      </span>
+                    </button>
+                  )}
                 </DialogPanel>
               </TransitionChild>
             </div>

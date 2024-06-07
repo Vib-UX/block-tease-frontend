@@ -16,13 +16,16 @@ import {
   batchSubscribeFor,
   chainLinkAutomationSubscription,
   checkBalances,
+  checkBalancesCardona,
   checkBalancesMetis,
   checkUserBalanceWeb3Auth,
   getTestFunds,
+  getTestFundsCardona,
   getTestFundsMetis,
   getTestFundsWeb3Auth,
   mintingNft,
   PurchaseSubsAvaGasslessBundle,
+  purchaseSubscriptionCardona,
   purchaseSubscriptionMetis,
 } from '@/lib/func';
 import { cn, toastStyles } from '@/lib/utils';
@@ -51,7 +54,7 @@ export default function MyModal({
   modelId: number;
   setIsUnlocked: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [chainIndex, setChainIndex] = useState(3);
+  const [chainIndex, setChainIndex] = useState(4);
   const [isOpen, setIsOpen] = useState(false);
   const [walletChosen, setWalletChosen] = useState('');
   const [batchGaslessTrx, setBatchGaslessTrx] = useState('');
@@ -59,6 +62,7 @@ export default function MyModal({
   const [avalancheCrossTxn, setAvalancheCrossTxn] = useState('');
   const [moonbeamTx, setMoonbeamTxn] = useState('');
   const [metisTx, setMetisTx] = useState('');
+  const [cardonaTx, setCardonaTx] = useState('');
   const [chainlinkCrossTxn, setChainLinkCrossTxn] = useState('');
   const [testTokensHash, setTestTokensHash] = useState('');
   const [nftTrx, setNftTrx] = useState('');
@@ -128,6 +132,34 @@ export default function MyModal({
     try {
       const resp = await fetch(
         'https://db-graph-backend.onrender.com/api/purchase-subscription-metis',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            modelId: modelId,
+            tokenId: (
+              BigInt(1e18) * BigInt(modelId) +
+              BigInt(subscriptionId)
+            ).toString(),
+          }),
+        }
+      );
+      const data = await resp.json();
+      if (data.success) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      toast.error('Something went wrong', toastStyles);
+    }
+  };
+  const chainLinkNotifierCardona = async () => {
+    try {
+      const resp = await fetch(
+        'https://db-graph-backend.onrender.com/api/purchase-subscription-cardona',
         {
           method: 'POST',
           headers: {
@@ -274,6 +306,32 @@ export default function MyModal({
           setIsOpen(true);
           // setIsUnlocked(true);
         }
+      } else if (walletChosen.toLowerCase() === 'cardona') {
+        setProgress(10);
+        const _provider = await login(4);
+        if (!_provider) {
+          throw new Error('Provider not initialized');
+        }
+        const resp = await purchaseSubscriptionCardona({
+          modelId: modelId,
+          subscriptionId: subscriptionId,
+          priceInUsd: value,
+          provider: _provider,
+        });
+        setCardonaTx(resp.dispatch);
+        showMsgs();
+        if (resp.dispatch) {
+          const res = await chainLinkNotifierCardona();
+          // mintNft(resp.fromAddr);
+          setProgress(100);
+          toast.success('Transaction successfull 🚀', toastStyles);
+          // localStorage.setItem(
+          //   modelId.toString(),
+          //   (BigInt(1e18) * BigInt(modelId) + BigInt(subscriptionId)).toString()
+          // );
+          setIsOpen(true);
+          // setIsUnlocked(true);
+        }
       } else if (walletChosen === 'avalanche') {
         setProgress(10);
         // console.log('ava selected?');
@@ -325,6 +383,10 @@ export default function MyModal({
         const _provider = await login(3);
         const signer = _provider.getSigner();
         amount = await checkBalancesMetis(signer);
+      } else if (walletChosen.toLowerCase() === 'cardona') {
+        const _provider = await login(3);
+        const signer = _provider.getSigner();
+        amount = await checkBalancesCardona(signer);
       } else {
         amount = await checkUserBalanceWeb3Auth(smartAccount);
       }
@@ -419,6 +481,7 @@ export default function MyModal({
                       {(approvetrx ||
                         batchGaslessTrx ||
                         metisTx ||
+                        cardonaTx ||
                         nftTrx ||
                         avalancheCrossTxn ||
                         chainlinkCrossTxn) && (
@@ -437,6 +500,8 @@ export default function MyModal({
                                 ? `https://ccip.chain.link/tx/${avalancheCrossTxn}`
                                 : walletChosen === 'Ethereum'
                                 ? `${chainConfig[1].blockExplorerUrl}/tx/${chainlinkCrossTxn}`
+                                : walletChosen === 'cardona'
+                                ? `${chainConfig[4].blockExplorerUrl}/tx/${cardonaTx}`
                                 : `${chainConfig[3].blockExplorerUrl}/tx/${metisTx}`
                             }
                             target='_blank'
@@ -556,6 +621,8 @@ export default function MyModal({
                                   coin.name.toLowerCase() === 'metis'
                                 ) {
                                   setChainIndex(3);
+                                } else if (coin.name === 'Cardona') {
+                                  setChainIndex(4);
                                 }
                                 setWalletChosen(coin.name.toLowerCase());
                               }}
@@ -626,6 +693,11 @@ export default function MyModal({
                             } else if (walletChosen.toLowerCase() === 'metis') {
                               const _provider = await login(3);
                               resp = await getTestFundsMetis(_provider);
+                            } else if (
+                              walletChosen.toLowerCase() === 'cardona'
+                            ) {
+                              const _provider = await login(4);
+                              resp = await getTestFundsCardona(_provider);
                             } else {
                               resp = await getTestFundsWeb3Auth(smartAccount);
                             }

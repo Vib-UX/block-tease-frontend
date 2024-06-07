@@ -11,7 +11,7 @@ import * as React from 'react';
 import toast from 'react-hot-toast';
 
 import useWeb3auth from '@/hooks/useWeb3auth';
-import { buyNftMetis } from '@/lib/func';
+import { buyNftCardona, buyNftMetis } from '@/lib/func';
 import { toastStyles } from '@/lib/utils';
 
 import BuyModal from '@/components/ui/BuyModal';
@@ -35,34 +35,33 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({}));
 export default function CustomizedTables({ chain }: { chain: string }) {
   const [progress, setProgress] = React.useState(0);
 
-
   const [selectActiveData, setSelectActiveData] = React.useState({
-    id: "",
-    tokenId: "",
-    price: "",
+    id: '',
+    tokenId: '',
+    price: '',
     icon: '',
     name: '',
-    listingPrice: ""
-  })
-  const [isOpen, setIsOpen] = React.useState(false)
-  const [txHash, setTxHash] = React.useState('')
+    listingPrice: '',
+  });
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [txHash, setTxHash] = React.useState('');
   const [provider, setProvider] = React.useState<any>(undefined);
 
   const { email, login } = useWeb3auth(3);
 
   const handleBuyNft = async (modelId: any, tokenId: any, price: any) => {
-    setProgress(10)
+    setProgress(10);
     toast.loading('Buying NFT', toastStyles);
     const _provider = await login(2);
-    const resp = await buyNftMetis({
+    const resp = await buyNftCardona({
       provider: _provider,
-      tokenId: tokenId
+      tokenId: tokenId,
     });
     try {
-      setTxHash(resp.transactionHash)
+      setTxHash(resp.transactionHash);
       if (chain.toLowerCase() !== 'metis') return;
       const apiResponse = await fetch(
-        'https://db-graph-backend.onrender.com/api/update-subscription-metis',
+        'https://db-graph-backend.onrender.com/api/update-subscription-cardona',
         {
           method: 'PATCH',
           headers: {
@@ -74,18 +73,18 @@ export default function CustomizedTables({ chain }: { chain: string }) {
           }),
         }
       );
-      setProgress(66)
+      setProgress(66);
       const responseData = await apiResponse.json();
       if (!apiResponse.ok) {
         throw new Error(responseData.message || 'Failed to purchase NFT');
       }
-      toast.dismiss()
+      toast.dismiss();
     } catch (error) {
       toast.dismiss();
       toast.error('Failed to purchase NFT', toastStyles);
     }
     if (resp.transactionHash) {
-      setProgress(99)
+      setProgress(99);
       toast.dismiss();
       toast.success('NFT successfully purchased', toastStyles);
     }
@@ -145,7 +144,7 @@ export default function CustomizedTables({ chain }: { chain: string }) {
       className='w-[1100px]  bg-[#130D1A] text-white border-fuchsia-700 border'
       sx={{ border: 'none' }}
     >
-      {selectActiveData.icon !== "" &&
+      {selectActiveData.icon !== '' && (
         <BuyModal
           txHash={txHash}
           progress={progress}
@@ -153,24 +152,28 @@ export default function CustomizedTables({ chain }: { chain: string }) {
           icon={selectActiveData.icon}
           isOpen={isOpen}
           onClick={() => {
-            handleBuyNft(selectActiveData.id, selectActiveData.tokenId, selectActiveData.price)
+            handleBuyNft(
+              selectActiveData.id,
+              selectActiveData.tokenId,
+              selectActiveData.price
+            );
           }}
           onClose={() => {
-            setIsOpen(false)
-            setProgress(0)
-            setTxHash("")
+            setIsOpen(false);
+            setProgress(0);
+            setTxHash('');
             setSelectActiveData({
-              icon: "",
-              id: "",
-              listingPrice: "",
-              name: "",
-              price: "",
-              tokenId: ""
-            })
+              icon: '',
+              id: '',
+              listingPrice: '',
+              name: '',
+              price: '',
+              tokenId: '',
+            });
           }}
           name={selectActiveData.name}
         />
-      }
+      )}
       <Table
         sx={{ minWidth: 100, border: 'none' }}
         aria-label='customized table'
@@ -208,29 +211,27 @@ export default function CustomizedTables({ chain }: { chain: string }) {
                     {modelData.name}
                     <svg
                       onClick={() => {
-                        setIsOpen(true)
-                        setSelectActiveData(
-                          {
-                            id: modelData.id,
-                            tokenId: row.tokenId,
-                            price: row.price,
-                            icon: modelData.icon,
-                            name: modelData.name,
-                            listingPrice: parseInt(row.price)
-                          }
-                        )
-                      }
-                      }
+                        setIsOpen(true);
+                        setSelectActiveData({
+                          id: modelData.id,
+                          tokenId: row.tokenId,
+                          price: row.price,
+                          icon: modelData.icon,
+                          name: modelData.name,
+                          listingPrice: parseInt(row.price),
+                        });
+                      }}
                       xmlns='http://www.w3.org/2000/svg'
                       fill='none'
                       viewBox='0 0 24 24'
                       strokeWidth={1.5}
                       stroke='currentColor'
-                      className={`${localStorage.getItem(modelData.id.toString()) !==
+                      className={`${
+                        localStorage.getItem(modelData.id.toString()) !==
                         modelData.tokenId
-                        ? 'cursor-not-allowed'
-                        : 'cursor-pointer'
-                        }' hover:text-fuchsia-600 w-5 h-5'`}
+                          ? 'cursor-not-allowed'
+                          : 'cursor-pointer'
+                      }' hover:text-fuchsia-600 w-5 h-5'`}
                     >
                       <path
                         strokeLinecap='round'

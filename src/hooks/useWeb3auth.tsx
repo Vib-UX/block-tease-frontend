@@ -54,6 +54,16 @@ export const chainConfig = [
     ticker: 'METIS',
     tickerName: 'METIS',
   },
+  //for cardona
+  {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    chainId: '0x98a', // hex of 43114
+    rpcTarget: 'https://rpc.cardona.zkevm-rpc.com',
+    displayName: 'zKEVM Cardona',
+    blockExplorerUrl: 'https://cardona-zkevm.polygonscan.com',
+    ticker: 'ETH',
+    tickerName: 'ETH',
+  },
 ];
 
 const config = [
@@ -77,6 +87,12 @@ const config = [
     bundlerUrl: `https://bundler.biconomy.io/api/v2/59902/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44`,
     chainId: 59902,
   },
+  //for cardona
+  {
+    biconomyPaymasterApiKey: 'uPfcURYvC.cbd1a374-9004-4290-93a5-84261ac4609a',
+    bundlerUrl: `https://bundler.biconomy.io/api/v2/2442/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44`,
+    chainId: 2442,
+  },
 ];
 
 function useWeb3auth(chainIndex?: number) {
@@ -85,11 +101,11 @@ function useWeb3auth(chainIndex?: number) {
     null
   );
 
-  const defaultChain = chainConfig[chainIndex ?? 3];
+  const defaultChain = chainConfig[chainIndex ?? 4];
   console.log(defaultChain, 'defaultChain');
 
   const privateKeyProvider: any = new EthereumPrivateKeyProvider({
-    config: { chainConfig: chainConfig[chainIndex ?? 3] },
+    config: { chainConfig: chainConfig[chainIndex ?? 4] },
   });
   const web3auth = new Web3Auth({
     clientId,
@@ -160,7 +176,7 @@ function useWeb3auth(chainIndex?: number) {
       );
       const web3AuthSigner = ethersProvider.getSigner();
       const address = await web3AuthSigner.getAddress();
-      if (chainIndex2 === 2 || chainIndex2 === 3) {
+      if (chainIndex2 === 2 || chainIndex2 === 3 || chainIndex === 4) {
         setAddress(address);
         setWalletAddress(address);
         setSmartAccountAddress(address);

@@ -9,11 +9,13 @@ const MarketPlaceCard = ({
   modelId,
   ipfsUrl,
   tokenId,
+  chain,
 }: {
   modelName: string;
   modelId: string;
   ipfsUrl: string;
-  tokenId: string
+  tokenId: string;
+  chain: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [teaseData, setTeaseData] = useState({
@@ -129,6 +131,7 @@ const MarketPlaceCard = ({
             name={modelName}
             tokenId={tokenId}
             modelId={parseInt(modelId)}
+            chain={chain}
           />
         </motion.div>
       </div>
