@@ -4,6 +4,16 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
+.ock-connectaccount {
+  @apply flex flex-grow;
+}
+.ock-connectaccount-button {
+  @apply inline-flex h-10 grow items-center justify-center gap-2 rounded-md bg-gradient-to-b from-[#FB0393] to-[#9A3CFF] text-white px-4 py-2;
+}
+.ock-connectaccount-inner {
+  @apply text-sm font-medium leading-5 text-white;
+}
+
 /* src/components/ui/styles.css */
 @keyframes ring {
   0% {

@@ -46,6 +46,11 @@ const nextConfig = {
 
     return config;
   },
+  env: {
+    GOOGLE_APP_CLIENT_ID: process.env.GOOGLE_APP_CLIENT_ID,
+    GOOGLE_APP_CLIENT_SECRET: process.env.GOOGLE_APP_CLIENT_SECRET,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+  },
 };
 
 module.exports = nextConfig;

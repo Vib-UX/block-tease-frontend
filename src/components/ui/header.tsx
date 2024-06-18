@@ -1,160 +1,44 @@
 'use client';
 
+import { useSession } from "next-auth/react";
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import { ImSpinner2 } from 'react-icons/im';
-import { IoMdPower } from 'react-icons/io';
+import { useAccount } from 'wagmi';
 
-import useWeb3auth from '@/hooks/useWeb3auth';
-import { userOnBoarding } from '@/lib/func';
-import { cn, toastStyles } from '@/lib/utils';
+import useFetchUserDetails from "@/hooks/useFetchUserDetails";
 
-import Avatar from '@/components/ui/avatar';
+import AccountConnect from '@/components/layout/header/AccountConnect';
+import GoogleSignIn from "@/components/layout/header/GoogleSiginModal";
+import Avatar from "@/components/ui/avatar";
 
 import logo from '../../../public/images/logoWithoutGradient.png';
-import useGlobalStore from '@/hooks/useGlobalStore';
-const getButtonCTA = ({
-  isLoading,
-  text,
-}: {
-  isLoading: boolean;
-  text: string;
-}) => {
-  if (isLoading) {
-    return (
-      <span
-        className={cn(
-          'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'
-        )}
-      >
-        <ImSpinner2 className='animate-spin' />
-      </span>
-    );
-  }
-  return text;
-};
+
 type props = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const Header = ({ isOpen, setIsOpen }: props) => {
-  const { login, loggedIn, logout, name, provider, email, smartAccount } =
-    useWeb3auth();
-  const { smartAddress } = useGlobalStore();
-  const [openAiId, setOpenAiId] = useState('');
-  const [ipfsUrl, setIpfsUrl] = useState('');
-  const [avatarLoading, setAvatarLoading] = useState(false);
-  const createNft = async (name: string) => {
-    try {
-      const res = await fetch(
-        'https://open-ai-avatar-nft-gen.onrender.com/generate-avatar-openAI',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ name: name }),
-        }
-      );
-      const data = await res.json();
-      if (data.success) {
-        //call contract
-        // const res = await userOnBoarding(provider, name);
-        const res = await userOnBoarding(name, smartAccount);
-        if (res?.hash) {
-          const fetcher = await fetch(
-            'https://open-ai-avatar-nft-gen.onrender.com/create-nft-pin-metadata',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                name: name,
-                description:
-                  'Welcome to BlockTease, with this NFT you gain access to our exclusive content! Enjoy (:',
-              }),
-            }
-          );
-          const resp = await fetcher.json();
-          if (resp.success) {
-            //call register api here
-            const reps = await fetch(
-              'https://db-graph-backend.onrender.com/api/register',
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  username: name,
-                  email: email,
-                  wallet_address: smartAddress,
-                  ipfs_url: resp.metadataIPFSUrl,
-                  openAi_tokenId: res.tokenId.toString(),
-                }),
-              }
-            );
-            const data = await reps.json();
-            if (data.success) {
-              fetchUserDetails(smartAddress || '', name);
-            }
-          }
-        }
-      }
-    } catch (error) {
-      toast.dismiss();
-      toast.error('Something went wrong', toastStyles);
-    }
-  };
-  const handleCopy = (address: string) => {
-    navigator.clipboard
-      .writeText(address)
-      .then(() => {
-        toast.success('Address copied to clipboard!', toastStyles);
-      })
-      .catch(() => {
-        toast.success('Something went wrong', toastStyles);
-      });
-  };
-  const fetchUserDetails = async (address: string, name: string) => {
-    try {
-      setAvatarLoading(true);
-      const resp = await fetch(
-        `https://db-graph-backend.onrender.com/api/user-info?wallet_address=${address}`,
-        {
-          method: 'GET',
-        }
-      );
-      const data = await resp.json();
-      if (data.success) {
-        setAvatarLoading(false);
-        setOpenAiId(data.data.user.openAi_tokenId);
-        setIpfsUrl(data.data.user.ipfs_url);
-      } else if (data.message === 'User not found') {
-        //call here
+  const { data: session, status } = useSession()
 
-        createNft(name);
-      }
-    } catch (error) {
-      setAvatarLoading(false);
-      toast.dismiss();
-      toast.error('Something went wrong', toastStyles);
-    }
-  };
+  const [isSignInOpen, setIsSignInOpen] = useState(false)
+  const { address } = useAccount()
+
+  const { data: userData, isLoading } = useFetchUserDetails()
+
   useEffect(() => {
-    // if (loggedIn && name && localStorage.getItem(name) === null) {
-    //   fetchNft();
-    // }
-    if (smartAddress && name) {
-      fetchUserDetails(smartAddress, name);
+    if (address) {
+      if (status === "unauthenticated" || userData?.isFound === false) {
+        setIsSignInOpen(true)
+      }
     }
-  }, [smartAddress, name]);
+  }, [address, status, userData?.isFound]);
+
+
   return (
     <div className='w-full flex items-center justify-between bg-[#130D1A] px-6 py-4 lg:py-6 fixed top-0 z-50'>
+      <GoogleSignIn isOpen={isSignInOpen} setIsOpen={setIsSignInOpen} />
       <div className='text-white lg:hidden'>
         {!isOpen ? (
           <svg
@@ -220,32 +104,17 @@ const Header = ({ isOpen, setIsOpen }: props) => {
           </svg>
         </div>
       </div>
-      <div className='flex items-center gap-6 justify-end w-1/4 mx-4'>
-        {smartAddress && (
+      <div className='flex items-center  justify-end gap-6  w-1/4 mx-4'>
+        <div className='flex items-center text-white justify-end'>
+          <AccountConnect />
+        </div>
+        {address && session && userData?.isFound && (
           <Avatar
-            userName={name || ''}
-            openId={openAiId}
-            ipfsUrl={ipfsUrl}
-            avatarLoading={avatarLoading}
+            userName={session.user.name || ''}
+            openId={userData?.open_ai_id}
+            ipfsUrl={userData?.ipfs}
+            avatarLoading={isLoading}
           />
-        )}
-        <button
-          onClick={() =>
-            !smartAddress ? login(0) : handleCopy(smartAddress || '')
-          }
-          className='z-30 relative bg-gradient-to-b from-[#FB0393] to-[#9A3CFF] font-bold rounded-md text-white py-2 px-4'
-        >
-          {getButtonCTA({
-            isLoading: false,
-            text: smartAddress
-              ? smartAddress.slice(0, 4) + '...' + smartAddress.slice(-4)
-              : 'Connect wallet',
-          })}
-        </button>
-        {smartAddress && (
-          <div className='cursor-pointer' onClick={() => logout()}>
-            <IoMdPower color='white' />
-          </div>
         )}
       </div>
     </div>

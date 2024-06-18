@@ -6,6 +6,7 @@ import '@/styles/globals.css';
 import '@/styles/colors.css';
 
 import { siteConfig } from '@/constant/config';
+import OnchainProviders from '@/OnchainProviders';
 
 // !STARTERCONF Change these default meta
 // !STARTERCONF Look at @/constant/config to change them
@@ -56,7 +57,9 @@ export default function RootLayout({
 }) {
   return (
     <html >
-      <body className=' ' >{children}</body>
+      <body>
+        <OnchainProviders>{children}</OnchainProviders>
+      </body>
     </html>
   );
 }

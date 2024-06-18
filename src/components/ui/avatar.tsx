@@ -1,7 +1,8 @@
 'use client';
-import RippleLoader from '@/components/ui/RippleLoader';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import RippleLoader from '@/components/ui/RippleLoader';
 
 const Avatar = ({
   userName,
@@ -43,7 +44,7 @@ const Avatar = ({
   }
   return (
     <a
-      href={`https://testnets.opensea.io/assets/avalanche-fuji/0x82376da85a76360bc9ffc9a542961429a2a653ff/${openId}`}
+      href={`https://testnets.opensea.io/assets/base-sepolia/0x57eb75df7f17aa5351f850040eed5c66f945df32/${openId}`}
       target='_blank'
       rel='noreferrer'
       className=' flex flex-col gap-1 items-center justify-center cursor-pointer'
