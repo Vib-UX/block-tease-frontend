@@ -1,6 +1,7 @@
 // import { MockUSDABI, PurchaseSubscriptionABI, BatchABI } from '@/constant/abi';
 import { PaymasterMode } from '@biconomy/account';
 import { ethers } from 'ethers';
+import { baseSepolia } from 'wagmi/chains';
 
 import { chainConfig } from '@/hooks/useWeb3auth';
 
@@ -25,6 +26,7 @@ import blockTeaseNftZkevmAbi from '../constant/Zkevm/blockTeaseNftZkevm.json';
 import markeplaceZkevmAbi from '../constant/Zkevm/marketplaceZkevm.json';
 import mUsdZkevmAbi from '../constant/Zkevm/mUsdZkevm.json';
 const mUsdZkevmAddr = '0x3FA6cfdC28Ad346c4360AA0543b5BfdA551c7111';
+const mUSDBase = "0x309222b7833D3D0A59A8eBf9C64A5790bf43E2aA"
 const blockTeaseNftZkevmAddr = '0x5192Ffbc96b2E731649714B7b51d4cC4CA1fAB8F';
 const marketplaceZkevmAddr = '0x054ba199Ef61ef15226e2CeB61138f7d5E2F8408';
 const nftAutomationAddr = '0x87555010E191072421d4f4B14E75FB59abE778B0';
@@ -437,6 +439,19 @@ export async function checkUserBalanceZkevm(smartAccount: any) {
 
   return { signerBalance };
 }
+
+export async function checkUserBalanceBase(address: any) {
+  const provider = new ethers.providers.JsonRpcProvider(
+    baseSepolia.rpcUrls.default.http[0]
+  );
+  const usdc = new ethers.Contract(mUSDBase, mUsdZkevmAbi, provider);
+  const signerBalance = ethers.utils.formatUnits(
+    await usdc.balanceOf(address),
+    8
+  );
+
+  return { signerBalance };
+}
 export async function checkUserBalanceAmoyWeb3Auth(smartAccount: any) {
   const provider = new ethers.providers.JsonRpcProvider(
     'https://rpc-amoy.polygon.technology'
@@ -498,6 +513,24 @@ export async function getTestFundsWeb3Auth(smartAccount: any) {
   const usdc = new ethers.Contract(
     usdcSepoliaEthAddr,
     UsdcEthSepoliaAbi,
+    thirdPartyProvider
+  );
+  const trx = await usdc.transfer(signerAddress, 100e8);
+  return { trxhash: trx.hash };
+}
+
+export async function getTestFundsBase(address: any) {
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://sepolia.base.org'
+  );
+  const signerAddress = address;
+  const thirdPartyProvider = new ethers.Wallet(
+    process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNER || '',
+    provider
+  );
+  const usdc = new ethers.Contract(
+    mUSDBase,
+    mockUsdAbi,
     thirdPartyProvider
   );
   const trx = await usdc.transfer(signerAddress, 100e8);

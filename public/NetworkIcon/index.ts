@@ -6,7 +6,7 @@ import morphIcon from 'public/NetworkIcon/mrph-morpheusnetwork.png';
 import polygonIcon from 'public/NetworkIcon/polygon-matic-logo.png';
 import PolygonZkevm from 'public/NetworkIcon/zkevm.png';
 import zksyncIcon from 'public/NetworkIcon/zksync-logo.png';
-
+import baseIcon from 'public/NetworkIcon/base_blue.png';
 export {
   avalancheIcon,
   ethereumIcon,
@@ -16,4 +16,5 @@ export {
   polygonIcon,
   zksyncIcon,
   PolygonZkevm,
+  baseIcon,
 };

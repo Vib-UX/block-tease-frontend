@@ -1,4 +1,3 @@
-import { toastStyles } from '@/lib/utils';
 import {
   Button,
   Dialog,
@@ -19,10 +18,12 @@ import {
   XIcon,
 } from 'react-share';
 
+import { toastStyles } from '@/lib/utils';
+
 export default function ShareButton() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const title = 'Block tease';
+  const title = 'Only tease';
   const url = window.location.href;
 
   function open() {
@@ -78,7 +79,7 @@ export default function ShareButton() {
                 <DialogPanel className=' max-w-md flex gap-4 flex-col items-center justify-start rounded-xl bg-white/5 p-6 backdrop-blur-2xl'>
                   <div className='mt-4 '>
                     <button
-                      className={`inline-flex items-center gap-2 rounded-md py-1.5 px-3 text-sm font-semibold text-white  focus:outline-none  hover:bg-[#fb0393]`}
+                      className="inline-flex items-center gap-2 rounded-md py-1.5 px-3 text-sm font-semibold text-white  focus:outline-none  hover:bg-[#fb0393]"
                       onClick={() => {
                         copyToClipboard();
                       }}

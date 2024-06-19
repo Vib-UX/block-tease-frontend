@@ -20,38 +20,10 @@ import { isLocal } from '@/constant/env';
 
 // Use the Paymaster Proxy when deployed.
 const isLocalEnv = isLocal;
-const defaultUrl = isLocalEnv
+export const defaultUrl = isLocalEnv
   ? process.env.NEXT_PUBLIC_PAYMASTER_URL
   : `http://localhost:3000/api/paymaster-proxy`;
-const LoadingSVG = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 100 100"
-    preserveAspectRatio="xMidYMid"
-  >
-    <circle
-      cx="50"
-      cy="50"
-      fill="none"
-      stroke="#93dbe9"
-      strokeWidth="10"
-      r="35"
-      strokeDasharray="164.93361431346415 56.97787143782138"
-      transform="rotate(275.845 50 50)"
-    >
-      <animateTransform
-        attributeName="transform"
-        type="rotate"
-        calcMode="linear"
-        values="0 50 50;360 50 50"
-        keyTimes="0;1"
-        dur="1s"
-        begin="0s"
-        repeatCount="indefinite"
-      />
-    </circle>
-  </svg>
-);
+
 
 const GoogleLogo = () => (
   <svg width='18' height='18' xmlns='http://www.w3.org/2000/svg'>
@@ -150,7 +122,6 @@ function GoogleSignIn({
     }
   });
   const contract = usePaymasterBundlerContract();
-
 
   const createNft = async (name: string) => {
     const res = await fetch(
