@@ -204,6 +204,8 @@ const Subscriptions = () => {
                   }}
                 />
               ))
+            : isFetching
+            ? [0, 1, 2].map((_, index) => <div key={index}>{<Shimmer />}</div>)
             : null}
         </div>
         {!data && !isFetching && (
@@ -305,5 +307,14 @@ const MarketPlaceCard2 = ({
     </div>
   );
 };
-
+const Shimmer = () => {
+  return (
+    <div
+      role='status'
+      className='flex items-center justify-center h-64 max-w-sm rounded-xl animate-pulse bg-[#1d1428]'
+    >
+      <span className='sr-only'>Loading...</span>
+    </div>
+  );
+};
 export default Subscriptions;
