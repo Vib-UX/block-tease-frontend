@@ -84,10 +84,6 @@ function useWeb3auth(chainIndex?: number) {
       defaultLanguage: 'en',
     },
   });
-  const metamaskAdapter = new MetamaskAdapter({
-    clientId,
-    web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
-  });
   const openloginAdapter = new OpenloginAdapter({
     adapterSettings: {
       whiteLabel: {
@@ -96,7 +92,6 @@ function useWeb3auth(chainIndex?: number) {
     },
   });
   web3auth.configureAdapter(openloginAdapter);
-  web3auth.configureAdapter(metamaskAdapter);
 
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);

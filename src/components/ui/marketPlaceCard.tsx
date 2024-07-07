@@ -13,30 +13,13 @@ const MarketPlaceCard = ({
   modelName: string;
   modelId: string;
   ipfsUrl: string;
-  tokenId: string
+  tokenId: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [teaseData, setTeaseData] = useState({
-    name: '',
-    image: '',
-  });
-  useEffect(() => {
-    const fetchTeaseData = async (ipfs: string) => {
-      try {
-        const response = await fetch(ipfs);
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        const data = await response.json();
-        console.log(data);
-        setTeaseData(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchTeaseData(ipfsUrl);
-  }, []);
+  const teaseData = {
+    name: modelName,
+    image: ipfsUrl,
+  };
   return (
     <div className='group wrapper z-10 relative overflow-hidden rounded-xl'>
       <div className='relative z-0 h-[300px]'>
